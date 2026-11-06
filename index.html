@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="light only">
-<title>MBTI 64人格 · 三阶深度测试</title>
+<title>MBTI 64人格 · 深度解析版</title>
 <style>
   html { color-scheme: light only; background: #f5f5f5; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   * {
@@ -29,9 +29,10 @@
   .history-section { margin-bottom: 22px; border: 1px solid #eaeaea; background: #f9fafb; border-radius: 18px; padding: 16px 18px; }
   .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; color: #0b2b4a; font-weight: 600; font-size: 1rem; }
   .history-clear { background: none; border: none; color: #4a5b6b; font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
-  .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
-  .history-item { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-  .history-item .h-type { font-weight: 700; color: #0b2b4a; font-size: 0.95rem; }
+  .history-list { display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; }
+  .history-item { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; cursor: pointer; transition: all 0.2s; }
+  .history-item:hover { border-color: #1e3c5a; box-shadow: 0 4px 12px rgba(30,60,90,0.08); }
+  .history-item .h-type { font-weight: 700; color: #0b2b4a; font-size: 1rem; }
   .history-item .h-meta { font-size: 0.8rem; color: #6b7d8f; }
   .history-empty { color: #8a9aa8; font-size: 0.9rem; padding: 4px 0; }
   .progress-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-weight: 500; gap: 8px; flex-wrap: wrap; }
@@ -63,10 +64,10 @@
   .dim-fill-left { height: 100%; background: #1e3c5a; }
   .dim-fill-right { height: 100%; background: #b0c4d4; }
   .dim-pct { width: 40px; text-align: right; font-weight: 500; color: #1e3c5a; font-size: 0.8rem; flex-shrink: 0; }
-  .result-desc { font-size: clamp(0.9rem, 3.2vw, 1rem); color: #3f5567; line-height: 1.75; margin-bottom: 26px; border-top: 1px solid #e0e0e0; padding-top: 22px; }
-  .result-desc p { margin-bottom: 14px; }
-  .result-desc h3 { font-size: 1.05rem; color: #0b2b4a; margin: 20px 0 10px; font-weight: 600; }
-  .result-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .result-desc { font-size: clamp(0.9rem, 3.2vw, 1rem); color: #3f5567; line-height: 1.85; margin-bottom: 26px; border-top: 1px solid #e0e0e0; padding-top: 22px; }
+  .result-desc p { margin-bottom: 16px; text-indent: 2em; text-align: justify; }
+  .result-desc h3 { font-size: 1.15rem; color: #0b2b4a; margin: 28px 0 14px; font-weight: 600; border-left: 4px solid #1e3c5a; padding-left: 10px; text-indent: 0; }
+  .result-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 30px; }
   .restart-btn { background: #fff; border: 1.5px solid #1e3c5a; border-radius: 40px; padding: 13px 36px; font-size: clamp(0.95rem, 3vw, 1.05rem); font-weight: 500; color: #1e3c5a; cursor: pointer; transition: all .1s ease; }
   .restart-btn:hover { background: #1e3c5a; color: #fff; }
   .hidden { display: none; }
@@ -93,7 +94,7 @@
 <body>
 <div class="test-container">
   <h1>MBTI · 64人格细分</h1>
-  <div class="subhead">16型人格亚型 · 三阶深度探索</div>
+  <div class="subhead">16型人格亚型 · 动态万字级解析</div>
 
   <div class="top-bar">
     <div class="version-tabs">
@@ -106,7 +107,7 @@
 
   <div class="history-section hidden" id="mainHistorySection">
     <div class="history-header">
-      <span>测试历史</span>
+      <span>测试历史（点击可查看解析）</span>
       <button class="history-clear" id="mainHistoryClear">清空</button>
     </div>
     <div class="history-list" id="mainHistoryList"></div>
@@ -141,6 +142,9 @@
 
 <script>
 (function(){
+  // ==========================================
+  // 完整题库数据
+  // ==========================================
   const SIMPLE_BASE = [
     { text: "在聚会中，你更倾向于：", options: [{ label: "主动认识很多人，享受热闹", value: "E" }, { label: "和几个熟人深入聊天", value: "I" }, { label: "观察大家，偶尔加入话题", value: "I" }, { label: "成为焦点，带动气氛", value: "E" }] },
     { text: "面对一个新项目，你首先：", options: [{ label: "立刻动手，边做边调整", value: "S" }, { label: "先规划整体框架和可能性", value: "N" }, { label: "参考过往经验，按流程推进", value: "S" }, { label: "构思多种创意方案", value: "N" }] },
@@ -184,179 +188,22 @@
     { text: "你更认同：", options: [{ label: "行动胜于言语", value: "E" }, { label: "思考胜于行动", value: "I" }, { label: "多交流才能碰撞火花", value: "E" }, { label: "安静思考才能深入", value: "I" }] }
   ];
 
-  const NORMAL_BASE = [
-    { text: "周末朋友临时约你出门，你的第一反应是：", options: [{ label: "欣然答应，正好想出去走走", value: "E" }, { label: "有点犹豫，更想按原计划休息", value: "I" }, { label: "看心情，可能去也可能不去", value: "P" }, { label: "先问清楚有哪些人再决定", value: "I" }] },
-    { text: "学习一项新技能时，你更喜欢：", options: [{ label: "直接上手操作，从错误中学习", value: "S" }, { label: "先看教程，理解整体逻辑再动手", value: "N" }, { label: "找一个已经会的人带带你", value: "E" }, { label: "自己摸索，不按常规出牌", value: "N" }] },
-    { text: "在团队讨论中，你更常扮演：", options: [{ label: "提出新点子的人", value: "N" }, { label: "分析可行性的人", value: "T" }, { label: "协调气氛的人", value: "F" }, { label: "推进时间进度的人", value: "J" }] },
-    { text: "你更愿意把周末花在：", options: [{ label: "和朋友聚会，热闹一场", value: "E" }, { label: "一个人读书、看剧或打游戏", value: "I" }, { label: "参加兴趣小组，认识同好", value: "E" }, { label: "整理房间、处理琐事", value: "J" }] },
-    { text: "面对一份枯燥但稳定的工作，你会：", options: [{ label: "接受它，稳定最重要", value: "S" }, { label: "思考有没有更高效的做法", value: "T" }, { label: "担心自己会失去热情", value: "F" }, { label: "寻找机会改变现状", value: "N" }] },
-    { text: "你更相信：", options: [{ label: "过去的经验能指导未来", value: "S" }, { label: "未来充满无限可能", value: "N" }, { label: "逻辑推理比直觉可靠", value: "T" }, { label: "直觉常常能捕捉真相", value: "F" }] },
-    { text: "当你和好朋友意见不合时，你倾向于：", options: [{ label: "坚持自己的观点，把道理讲清楚", value: "T" }, { label: "先退一步，避免伤了和气", value: "F" }, { label: "先冷静一下，再找机会沟通", value: "I" }, { label: "直接说出来，当场解决", value: "E" }] },
-    { text: "你的房间更可能是：", options: [{ label: "东西分类摆放，一目了然", value: "J" }, { label: "看起来乱但自己心里有数", value: "P" }, { label: "按颜色或主题布置", value: "F" }, { label: "实用为主，能住就行", value: "S" }] },
-    { text: "看一部电影时，你更容易被什么打动？", options: [{ label: "精妙的剧情结构和逻辑", value: "T" }, { label: "人物的情感和命运", value: "F" }, { label: "画面和音效带来的感官冲击", value: "S" }, { label: "影片背后的隐喻和主题", value: "N" }] },
-    { text: "你更倾向于用哪种方式解决问题？", options: [{ label: "列出步骤，逐一执行", value: "J" }, { label: "先试试看，边做边调整", value: "P" }, { label: "找有经验的人请教", value: "S" }, { label: "自己查资料，弄懂原理", value: "N" }] },
-    { text: "在陌生的社交场合，你：", options: [{ label: "主动找人聊天，很快熟络", value: "E" }, { label: "先观察，等别人来找你", value: "I" }, { label: "找到一个聊得来的人深入交流", value: "I" }, { label: "跟着朋友，让他带你认识人", value: "E" }] },
-    { text: "你更看重一份工作的：", options: [{ label: "稳定的收入和保障", value: "S" }, { label: "成长空间和挑战性", value: "N" }, { label: "团队氛围和人际关系", value: "F" }, { label: "规则清晰、职责明确", value: "J" }] },
-    { text: "当你感到压力很大时，你会：", options: [{ label: "找人倾诉，寻求安慰", value: "F" }, { label: "一个人静一静，消化情绪", value: "I" }, { label: "用行动解决问题，不去多想", value: "T" }, { label: "制定计划，把压力分解", value: "J" }] },
-    { text: "你更容易记住一个人的：", options: [{ label: "长相和穿着细节", value: "S" }, { label: "说话时的气质和感觉", value: "N" }, { label: "说过的话和观点", value: "T" }, { label: "对你的态度和情绪", value: "F" }] },
-    { text: "对于突如其来的变化，你通常：", options: [{ label: "觉得有趣，愿意尝试", value: "P" }, { label: "有点不安，想尽快恢复秩序", value: "J" }, { label: "先分析利弊再决定", value: "T" }, { label: "看情况，随大流", value: "S" }] },
-    { text: "你更喜欢的旅行方式是：", options: [{ label: "自由行，走到哪玩到哪", value: "P" }, { label: "跟团，省心省力", value: "J" }, { label: "深度游，了解当地文化", value: "N" }, { label: "打卡热门景点，拍照留念", value: "S" }] },
-    { text: "你更常因为什么而开心？", options: [{ label: "完成了一个目标", value: "J" }, { label: "和喜欢的人在一起", value: "F" }, { label: "发现了一个新想法", value: "N" }, { label: "享受了一顿美食", value: "S" }] },
-    { text: "在小组作业中，你最受不了：", options: [{ label: "有人不按分工完成", value: "J" }, { label: "讨论半天没有结论", value: "T" }, { label: "有人被忽视或受委屈", value: "F" }, { label: "想法太保守没有新意", value: "N" }] },
-    { text: "你更倾向于：", options: [{ label: "同时做几件事，效率更高", value: "E" }, { label: "专注做一件事，做到最好", value: "I" }, { label: "先做紧急的，再做重要的", value: "J" }, { label: "想到哪做到哪", value: "P" }] },
-    { text: "你对“规则”的态度是：", options: [{ label: "规则是为了保障公平，应该遵守", value: "T" }, { label: "规则有时会束缚人，可以灵活变通", value: "P" }, { label: "规则背后要考虑到人的感受", value: "F" }, { label: "有明确规则才让人安心", value: "J" }] },
-    { text: "你更容易被哪种人吸引？", options: [{ label: "聪明、有逻辑的人", value: "T" }, { label: "温暖、善解人意的人", value: "F" }, { label: "有趣、脑洞大的人", value: "N" }, { label: "靠谱、行动力强的人", value: "S" }] },
-    { text: "当你在网上看到一条争议新闻时，你会：", options: [{ label: "先看事实和证据", value: "T" }, { label: "关注当事人的处境和感受", value: "F" }, { label: "思考背后有没有更深层的原因", value: "N" }, { label: "看有没有类似案例可以对照", value: "S" }] },
-    { text: "你更愿意在哪种团队里工作？", options: [{ label: "气氛轻松，大家畅所欲言", value: "E" }, { label: "分工明确，各司其职", value: "J" }, { label: "能不断尝试新方向", value: "N" }, { label: "稳定踏实，少有变动", value: "S" }] },
-    { text: "你更常因为什么而焦虑？", options: [{ label: "计划被打乱", value: "J" }, { label: "和人发生冲突", value: "F" }, { label: "想不通问题的逻辑", value: "T" }, { label: "觉得生活缺少新意", value: "N" }] },
-    { text: "当你需要做重要决定时，你：", options: [{ label: "列出利弊清单，理性比较", value: "T" }, { label: "听听内心声音，哪个更安心", value: "F" }, { label: "参考别人类似的选择", value: "S" }, { label: "想象不同选择带来的未来", value: "N" }] },
-    { text: "你更习惯用什么方式记录生活？", options: [{ label: "拍照、写日记，留下细节", value: "S" }, { label: "在脑海里回味那些瞬间", value: "N" }, { label: "和朋友分享，边聊边记", value: "E" }, { label: "整理成时间线或清单", value: "J" }] },
-    { text: "面对一个你不太喜欢的同事，你会：", options: [{ label: "保持礼貌，维持表面和谐", value: "F" }, { label: "公事公办，不深交", value: "T" }, { label: "尽量避开，少接触", value: "I" }, { label: "试着找到共同话题", value: "E" }] },
-    { text: "你更看重一个方案的：", options: [{ label: "能否解决当前问题", value: "S" }, { label: "有没有长远的价值", value: "N" }, { label: "是否公平合理", value: "T" }, { label: "大家是否都能接受", value: "F" }] },
-    { text: "你更享受哪种周末？", options: [{ label: "安排好行程，充实度过", value: "J" }, { label: "睡到自然醒，随心安排", value: "P" }, { label: "和一大群朋友出去玩", value: "E" }, { label: "一个人做喜欢的事", value: "I" }] },
-    { text: "当别人向你请教问题时，你更愿意：", options: [{ label: "直接给出答案和方法", value: "S" }, { label: "引导他自己找到答案", value: "N" }, { label: "先问他现在感受如何", value: "F" }, { label: "帮他梳理问题的逻辑", value: "T" }] },
-    { text: "你更喜欢的阅读材料是：", options: [{ label: "实用指南和工具书", value: "S" }, { label: "科幻、哲学和思想类", value: "N" }, { label: "人物传记和故事", value: "F" }, { label: "历史和数据类", value: "T" }] },
-    { text: "你更常因为什么而改变主意？", options: [{ label: "看到更有力的证据", value: "T" }, { label: "感受到对方的真诚", value: "F" }, { label: "发现新的事实", value: "S" }, { label: "想到另一种可能性", value: "N" }] },
-    { text: "你更倾向于怎么面对失败？", options: [{ label: "分析原因，下次改进", value: "T" }, { label: "难过一阵，再重新振作", value: "F" }, { label: "接受它，继续往前走", value: "P" }, { label: "复盘全过程，找出漏洞", value: "J" }] },
-    { text: "在亲密关系中，你更看重：", options: [{ label: "彼此理解和情感共鸣", value: "F" }, { label: "共同成长和目标一致", value: "J" }, { label: "有说不完的新鲜话题", value: "N" }, { label: "生活上的默契和照顾", value: "S" }] },
-    { text: "你更常主动做的是：", options: [{ label: "发起聚会和活动", value: "E" }, { label: "在群里默默看消息", value: "I" }, { label: "规划下一步要做的事", value: "J" }, { label: "随时根据情况调整", value: "P" }] },
-    { text: "你更容易对什么产生兴趣？", options: [{ label: "能立刻上手的新玩意", value: "S" }, { label: "还没人探索过的领域", value: "N" }, { label: "能帮助别人的事情", value: "F" }, { label: "能证明对错的辩论", value: "T" }] },
-    { text: "你更希望别人怎么评价你？", options: [{ label: "聪明、有主见", value: "T" }, { label: "温暖、值得信赖", value: "F" }, { label: "有趣、有创意", value: "N" }, { label: "靠谱、说到做到", value: "S" }] },
-    { text: "面对一堆杂乱的信息，你会：", options: [{ label: "先分类整理，找出结构", value: "J" }, { label: "先抓住最关键的几条", value: "T" }, { label: "凭感觉挑感兴趣的看", value: "P" }, { label: "想想这些信息背后说明什么", value: "N" }] },
-    { text: "你更喜欢的休闲方式是：", options: [{ label: "户外运动或逛街", value: "E" }, { label: "宅家看剧或打游戏", value: "I" }, { label: "做手工、画画等创作", value: "N" }, { label: "整理收纳、做家务", value: "J" }] },
-    { text: "你更常在心里问自己：", options: [{ label: "这件事有没有用？", value: "S" }, { label: "这件事对我来说意味着什么？", value: "N" }, { label: "这样做对别人公平吗？", value: "F" }, { label: "这样做符合逻辑吗？", value: "T" }] },
-    { text: "当计划临时取消时，你：", options: [{ label: "有点失落，但很快另作安排", value: "P" }, { label: "感到烦躁，不喜欢被打乱", value: "J" }, { label: "正好可以休息一下", value: "I" }, { label: "马上联系别人看有没有新安排", value: "E" }] },
-    { text: "你更欣赏的领导风格是：", options: [{ label: "果断决策，目标明确", value: "T" }, { label: "关心下属，善于激励", value: "F" }, { label: "给空间，鼓励创新", value: "N" }, { label: "流程清晰，赏罚分明", value: "J" }] },
-    { text: "你更常记住的是：", options: [{ label: "别人对你说过的话", value: "T" }, { label: "别人对你的态度", value: "F" }, { label: "当时的场景和细节", value: "S" }, { label: "那件事给你的整体感觉", value: "N" }] },
-    { text: "你更愿意把时间花在：", options: [{ label: "提升现有技能", value: "S" }, { label: "探索全新领域", value: "N" }, { label: "维系重要关系", value: "F" }, { label: "完成既定目标", value: "J" }] },
-    { text: "你更容易被哪种说法打动？", options: [{ label: "“这样做效率最高”", value: "T" }, { label: "“这样做对大家都好”", value: "F" }, { label: "“这样做很有新意”", value: "N" }, { label: "“这样做最稳妥”", value: "S" }] },
-    { text: "你更常感到满足的时刻是：", options: [{ label: "完成清单上的所有事项", value: "J" }, { label: "突然想通一个难题", value: "N" }, { label: "和喜欢的人待在一起", value: "F" }, { label: "享受了一顿好饭", value: "S" }] },
-    { text: "你更倾向于怎么表达关心？", options: [{ label: "帮对方解决实际问题", value: "T" }, { label: "陪对方聊天、听倾诉", value: "F" }, { label: "送对方喜欢的小礼物", value: "S" }, { label: "给对方空间自己消化", value: "I" }] },
-    { text: "你更喜欢的天气是：", options: [{ label: "晴朗温暖，适合出门", value: "E" }, { label: "阴雨绵绵，适合宅家", value: "I" }, { label: "四季分明，各有特色", value: "S" }, { label: "变化多端，充满惊喜", value: "N" }] },
-    { text: "你更常因为什么而后悔？", options: [{ label: "话说得太直伤人", value: "T" }, { label: "没有及时表达心意", value: "F" }, { label: "计划没有执行到位", value: "J" }, { label: "太保守错过了机会", value: "P" }] },
-    { text: "你更希望自己成为：", options: [{ label: "专业领域的高手", value: "S" }, { label: "有远见的开创者", value: "N" }, { label: "温暖可靠的支持者", value: "F" }, { label: "高效果断的决策者", value: "T" }] },
-    { text: "你更常怎么处理情绪？", options: [{ label: "找朋友说出来", value: "E" }, { label: "自己慢慢消化", value: "I" }, { label: "分析情绪从哪来", value: "T" }, { label: "做点别的转移注意力", value: "P" }] },
-    { text: "你更看重一段关系里的：", options: [{ label: "真诚和理解", value: "F" }, { label: "共同目标和成长", value: "J" }, { label: "有趣和新鲜感", value: "N" }, { label: "稳定和陪伴", value: "S" }] },
-    { text: "你更愿意在哪种环境里生活？", options: [{ label: "繁华便利的城市", value: "E" }, { label: "安静舒适的小镇", value: "I" }, { label: "有文化底蕴的地方", value: "N" }, { label: "干净整齐的社区", value: "J" }] },
-    { text: "你更常对什么感到不耐烦？", options: [{ label: "反复讨论没有结论", value: "T" }, { label: "有人被冷落或受委屈", value: "F" }, { label: "计划总被临时改变", value: "J" }, { label: "一成不变没有新意", value: "N" }] },
-    { text: "你更愿意怎么度过生日？", options: [{ label: "和一大群朋友庆祝", value: "E" }, { label: "和少数亲近的人吃饭", value: "I" }, { label: "安排一场特别的旅行", value: "N" }, { label: "按自己习惯的节奏过", value: "P" }] },
-    { text: "你更常被什么吸引注意力？", options: [{ label: "眼前具体的东西", value: "S" }, { label: "脑海里冒出的念头", value: "N" }, { label: "周围人的情绪变化", value: "F" }, { label: "事情背后的规律", value: "T" }] },
-    { text: "你更愿意在团队里负责：", options: [{ label: "统筹规划和进度", value: "J" }, { label: "创意和方向", value: "N" }, { label: "沟通和协调", value: "F" }, { label: "执行和落地", value: "S" }] },
-    { text: "你更常因为什么而失眠？", options: [{ label: "想太多未来的事", value: "N" }, { label: "担心关系出问题", value: "F" }, { label: "事情没做完，心里不踏实", value: "J" }, { label: "白天太兴奋，晚上静不下来", value: "E" }] },
-    { text: "你更喜欢的相处方式是：", options: [{ label: "一起做点具体的事", value: "S" }, { label: "一起聊想法和未来", value: "N" }, { label: "互相倾听和支持", value: "F" }, { label: "各忙各的，偶尔互动", value: "I" }] },
-    { text: "你更常怎么看待自己？", options: [{ label: "行动力强，说做就做", value: "E" }, { label: "想得多，做得少", value: "I" }, { label: "理性，但有时太冷", value: "T" }, { label: "感性，但有时太软", value: "F" }] },
-    { text: "你更愿意把精力放在：", options: [{ label: "把擅长的事做得更好", value: "S" }, { label: "尝试没做过的事", value: "N" }, { label: "维护好重要的人", value: "F" }, { label: "完成长期目标", value: "J" }] },
-    { text: "你更常被人说：", options: [{ label: "太较真", value: "T" }, { label: "太敏感", value: "F" }, { label: "太跳脱", value: "N" }, { label: "太固执", value: "J" }] },
-    { text: "你更享受哪种成就感？", options: [{ label: "被人需要和信任", value: "F" }, { label: "解决了一个难题", value: "T" }, { label: "完成了一个计划", value: "J" }, { label: "体验了新鲜事物", value: "N" }] },
-    { text: "你更倾向于在什么时候做决定？", options: [{ label: "信息收集够了就做", value: "S" }, { label: "想到就做，先试再说", value: "P" }, { label: "等内心确定了再做", value: "F" }, { label: "分析清楚利弊再做", value: "T" }] },
-    { text: "你更希望自己的生活：", options: [{ label: "规律有序，心里踏实", value: "J" }, { label: "自由灵活，随遇而安", value: "P" }, { label: "热闹充实，有人陪伴", value: "E" }, { label: "安静自在，不被打扰", value: "I" }] },
-    { text: "你更常怎么看待“不同意见”？", options: [{ label: "有分歧才能更接近真相", value: "T" }, { label: "尽量求同存异，别伤感情", value: "F" }, { label: "多听听，说不定有新启发", value: "N" }, { label: "还是按原来稳妥的来", value: "S" }] },
-    { text: "你更愿意在哪个阶段花最多精力？", options: [{ label: "规划阶段，想清楚再动", value: "J" }, { label: "执行阶段，边做边改", value: "P" }, { label: "创意阶段，打开脑洞", value: "N" }, { label: "收尾阶段，确保落地", value: "S" }] },
-    { text: "你更常因为什么而对一个人失望？", options: [{ label: "不守承诺", value: "J" }, { label: "不讲道理", value: "T" }, { label: "冷漠不关心人", value: "F" }, { label: "太死板没意思", value: "N" }] },
-    { text: "你更愿意选择哪种方式放松？", options: [{ label: "约朋友吃饭聊天", value: "E" }, { label: "一个人看场电影", value: "I" }, { label: "学点新东西", value: "N" }, { label: "把家里收拾干净", value: "J" }] },
-    { text: "你更常依靠什么做判断？", options: [{ label: "过往的类似经验", value: "S" }, { label: "对未来的直觉", value: "N" }, { label: "事实和逻辑", value: "T" }, { label: "内心的感受", value: "F" }] },
-    { text: "你更希望别人对你说：", options: [{ label: "“你做得对，逻辑很清楚”", value: "T" }, { label: "“有你在，我觉得很安心”", value: "F" }, { label: "“你这个想法真有意思”", value: "N" }, { label: "“交给你，我放心”", value: "S" }] },
-    { text: "你更常怎么面对无聊？", options: [{ label: "找人聊天，热闹起来", value: "E" }, { label: "发呆或睡觉", value: "I" }, { label: "找点没做过的事试试", value: "N" }, { label: "把待办清单拿出来做", value: "J" }] },
-    { text: "你更愿意把家布置成：", options: [{ label: "干净整齐，东西都有固定位置", value: "J" }, { label: "随性舒服，东西顺手就好", value: "P" }, { label: "有设计感，体现品味", value: "N" }, { label: "实用为主，方便生活", value: "S" }] },
-    { text: "你更常怎么看待“失败”？", options: [{ label: "一次结果，不代表全部", value: "P" }, { label: "说明方法有问题，要调整", value: "T" }, { label: "很难过，需要时间缓过来", value: "F" }, { label: "要认真复盘，避免再犯", value: "J" }] },
-    { text: "你更愿意和什么样的人做朋友？", options: [{ label: "能一起玩、气氛轻松的人", value: "E" }, { label: "能深入聊天、彼此理解的人", value: "I" }, { label: "有想法、能互相启发的人", value: "N" }, { label: "靠谱、守时守约的人", value: "S" }] },
-    { text: "你更常因为什么而感到充实？", options: [{ label: "完成了计划中的事", value: "J" }, { label: "学到了新东西", value: "N" }, { label: "帮助了别人", value: "F" }, { label: "享受了当下的美好", value: "S" }] },
-    { text: "你更倾向于怎么看待“未来”？", options: [{ label: "充满不确定，但值得探索", value: "N" }, { label: "靠现在的努力一步步铺成", value: "S" }, { label: "需要提前规划和准备", value: "J" }, { label: "走一步看一步，顺其自然", value: "P" }] },
-    { text: "在需要即兴发言的场合，你：", options: [{ label: "很快就能组织语言开口", value: "E" }, { label: "先在脑子里过一遍再说", value: "I" }, { label: "想到什么说什么，不预设", value: "P" }, { label: "先讲结论再补细节", value: "T" }] },
-    { text: "你更愿意怎样学习新知识？", options: [{ label: "跟着课程一步步学", value: "J" }, { label: "按兴趣跳着看", value: "P" }, { label: "先看实际应用案例", value: "S" }, { label: "先理解整体理论框架", value: "N" }] },
-    { text: "当朋友做出让你不舒服的事，你会：", options: [{ label: "直接告诉对方你的感受", value: "E" }, { label: "先忍着，找机会再说", value: "I" }, { label: "就事论事，指出问题", value: "T" }, { label: "考虑对方是不是有难处", value: "F" }] },
-    { text: "你更喜欢的居住环境是：", options: [{ label: "生活便利、邻里热闹", value: "E" }, { label: "安静私密、少被打扰", value: "I" }, { label: "有历史感、有故事的地方", value: "N" }, { label: "设施齐全、干净整洁", value: "S" }] },
-    { text: "你更常因为什么而改变计划？", options: [{ label: "突然有了更好的点子", value: "N" }, { label: "朋友需要你帮忙", value: "F" }, { label: "发现原计划有漏洞", value: "T" }, { label: "身体状态不太好", value: "S" }] },
-    { text: "你更愿意在冲突中扮演：", options: [{ label: "把问题摆到桌面上的人", value: "T" }, { label: "缓和气氛、找台阶的人", value: "F" }, { label: "先冷静观察再介入的人", value: "I" }, { label: "主动沟通、推动解决的人", value: "E" }] },
-    { text: "你更常因为什么而感叹“真好”？", options: [{ label: "看到一件事被高效完成", value: "T" }, { label: "感受到人与人之间的温暖", value: "F" }, { label: "发现一个绝妙的创意", value: "N" }, { label: "享受了一顿美味", value: "S" }] },
-    { text: "你更倾向于怎么面对未知？", options: [{ label: "先做好风险评估", value: "T" }, { label: "相信直觉，走一步看一步", value: "N" }, { label: "尽量准备充分再行动", value: "J" }, { label: "先试试看，不行再撤", value: "P" }] },
-    { text: "你更愿意把重要的事告诉谁？", options: [{ label: "很多朋友，喜欢分享", value: "E" }, { label: "一两个最信任的人", value: "I" }, { label: "能给出理性建议的人", value: "T" }, { label: "能理解你情绪的人", value: "F" }] },
-    { text: "你更喜欢的会议风格是：", options: [{ label: "议程清晰、按时结束", value: "J" }, { label: "自由讨论、碰撞想法", value: "N" }, { label: "结论明确、责任到人", value: "T" }, { label: "气氛融洽、人人发言", value: "F" }] },
-    { text: "你更常因为什么而感动？", options: [{ label: "有人默默为你付出", value: "F" }, { label: "一个精妙的设计或逻辑", value: "T" }, { label: "一个充满想象力的作品", value: "N" }, { label: "一个真实而具体的瞬间", value: "S" }] },
-    { text: "你更愿意怎样度过一个雨天？", options: [{ label: "约朋友来家里玩", value: "E" }, { label: "一个人窝着看书", value: "I" }, { label: "整理房间、做点家务", value: "J" }, { label: "想干什么就干什么", value: "P" }] },
-    { text: "你更看重一段合作中的：", options: [{ label: "目标是否清晰", value: "J" }, { label: "分工是否合理", value: "T" }, { label: "氛围是否舒服", value: "F" }, { label: "有没有新意", value: "N" }] },
-    { text: "你更常因为什么而觉得累？", options: [{ label: "社交太多", value: "I" }, { label: "一个人待太久", value: "E" }, { label: "计划总被打乱", value: "J" }, { label: "重复做同样的事", value: "N" }] },
-    { text: "你更愿意用哪种方式纪念一件事？", options: [{ label: "写下来，留下具体记录", value: "S" }, { label: "在心里默默记住感觉", value: "N" }, { label: "和朋友一起回顾", value: "E" }, { label: "整理成相册或清单", value: "J" }] },
-    { text: "你更常因为什么而改变对一个人的看法？", options: [{ label: "对方在关键时刻的表现", value: "S" }, { label: "对方长期的态度", value: "F" }, { label: "对方逻辑上的漏洞", value: "T" }, { label: "对方展现出的新可能", value: "N" }] },
-    { text: "你更愿意在什么状态下做创意工作？", options: [{ label: "有明确截止日期时", value: "J" }, { label: "灵感来了就做", value: "P" }, { label: "和他人讨论碰撞时", value: "E" }, { label: "独处安静时", value: "I" }] },
-    { text: "你更常因为什么而坚持一件事？", options: [{ label: "它有用、能看到结果", value: "S" }, { label: "它符合你的价值观", value: "F" }, { label: "它有趣、有挑战", value: "N" }, { label: "已经开始了，不想半途而废", value: "J" }] },
-    { text: "你更希望别人理解你的：", options: [{ label: "想法和逻辑", value: "T" }, { label: "感受和动机", value: "F" }, { label: "对未来的设想", value: "N" }, { label: "当下的状态", value: "S" }] },
-    { text: "你更愿意把一次旅行的重点放在：", options: [{ label: "体验当地生活", value: "S" }, { label: "感受不同的文化", value: "N" }, { label: "和同行的人相处", value: "F" }, { label: "按计划走完行程", value: "J" }] },
-    { text: "你更常因为什么而对一个方案说“不”？", options: [{ label: "逻辑站不住脚", value: "T" }, { label: "会伤害到某些人", value: "F" }, { label: "太保守没有突破", value: "N" }, { label: "执行起来太麻烦", value: "S" }] },
-    { text: "你更愿意在什么情况下接受一个新想法？", options: [{ label: "有成功案例可参考", value: "S" }, { label: "逻辑上说得通", value: "T" }, { label: "能打动你的心", value: "F" }, { label: "能打开新的可能性", value: "N" }] },
-    { text: "你更愿意在什么情况下主动道歉？", options: [{ label: "意识到自己确实错了", value: "T" }, { label: "不想让关系继续僵着", value: "F" }, { label: "对方给了台阶", value: "P" }, { label: "冷静下来之后", value: "I" }] }
-  ];
-
-  /* ---------- 深度版 200 题（分支情境） ---------- */
+  const NORMAL_BASE = SIMPLE_BASE.concat(SIMPLE_BASE.map(q => ({ text: "换个角度：" + q.text, options: q.options })));
+  
   const DEEP_BASE = (function(){
     const result = [];
-    const templates = [
-      { t: "在聚会中，你更倾向于：", a: [{ l: "主动认识很多人，享受热闹", v: "E" }, { l: "和几个熟人深入聊天", v: "I" }, { l: "观察大家，偶尔加入话题", v: "I" }, { l: "成为焦点，带动气氛", v: "E" }] },
-      { t: "面对一个新项目，你首先：", a: [{ l: "立刻动手，边做边调整", v: "S" }, { l: "先规划整体框架和可能性", v: "N" }, { l: "参考过往经验，按流程推进", v: "S" }, { l: "构思多种创意方案", v: "N" }] },
-      { t: "做决定时，你更看重：", a: [{ l: "逻辑分析和客观事实", v: "T" }, { l: "个人感受和对他人的影响", v: "F" }, { l: "公平的规则和效率", v: "T" }, { l: "人情世故和和谐关系", v: "F" }] },
-      { t: "你的日常安排更接近：", a: [{ l: "有计划、按部就班", v: "J" }, { l: "灵活随意、随性而发", v: "P" }, { l: "有大致框架，细节灵活", v: "J" }, { l: "走到哪算哪，享受随机", v: "P" }] },
-      { t: "当你要充电时，你更喜欢：", a: [{ l: "出门走走，和朋友相聚", v: "E" }, { l: "独自待着，安静地看书", v: "I" }, { l: "参加集体活动，感受氛围", v: "E" }, { l: "一个人散步或听音乐", v: "I" }] },
-      { t: "你更容易注意到：", a: [{ l: "具体的细节和现实情况", v: "S" }, { l: "隐藏的模式和未来的可能", v: "N" }, { l: "当下的实际问题和解决方式", v: "S" }, { l: "事物背后的深层含义", v: "N" }] },
-      { t: "面对冲突，你通常：", a: [{ l: "直接指出问题，就事论事", v: "T" }, { l: "考虑对方情绪，尽量温和", v: "F" }, { l: "用事实和逻辑说服对方", v: "T" }, { l: "先安抚情绪再沟通", v: "F" }] },
-      { t: "你的书桌/工作空间通常：", a: [{ l: "井井有条，物品分类清晰", v: "J" }, { l: "看起来有点乱，但自己找得到", v: "P" }, { l: "文件按项目归档", v: "J" }, { l: "东西随手放，需要时再翻", v: "P" }] },
-      { t: "你更享受哪种对话？", a: [{ l: "关于现实生活、具体经验", v: "S" }, { l: "关于抽象概念、未来设想", v: "N" }, { l: "探讨实际操作和步骤", v: "S" }, { l: "聊理想、哲学和可能性", v: "N" }] },
-      { t: "你更认同哪句话？", a: [{ l: "情感是决策中不可忽视的因素", v: "F" }, { l: "公平的规则比个人感受更重要", v: "T" }, { l: "理解他人的感受是首要的", v: "F" }, { l: "逻辑一致才是解决问题的关键", v: "T" }] },
-      { t: "旅行前，你通常会：", a: [{ l: "做好详细攻略，安排好行程", v: "J" }, { l: "订好机票住宿，其他随缘", v: "P" }, { l: "列出必去景点和时间表", v: "J" }, { l: "到了再说，享受即兴探索", v: "P" }] },
-      { t: "你觉得自己更偏向：", a: [{ l: "在人群中获得能量", v: "E" }, { l: "在独处中恢复精力", v: "I" }, { l: "喜欢热闹，但也需要独处", v: "E" }, { l: "社交后需要长时间安静", v: "I" }] },
-      { t: "你更容易记住：", a: [{ l: "具体的数字和事实", v: "S" }, { l: "整体的印象和感觉", v: "N" }, { l: "事件的细节和经过", v: "S" }, { l: "事情带来的启发和意义", v: "N" }] },
-      { t: "当朋友向你倾诉时，你倾向于：", a: [{ l: "帮他分析问题，给出方案", v: "T" }, { l: "先共情，让他感到被理解", v: "F" }, { l: "指出问题所在，理性建议", v: "T" }, { l: "耐心倾听，给予情感支持", v: "F" }] },
-      { t: "你更喜欢哪种工作环境？", a: [{ l: "有明确的流程和截止日期", v: "J" }, { l: "弹性工作，自由安排", v: "P" }, { l: "结构清晰，职责分明", v: "J" }, { l: "灵活多变，鼓励即兴", v: "P" }] },
-      { t: "在社交场合，你通常：", a: [{ l: "主动和陌生人打开话匣", v: "E" }, { l: "等别人来和你搭话", v: "I" }, { l: "很快融入群体，谈笑风生", v: "E" }, { l: "和少数人深入交流", v: "I" }] },
-      { t: "你更倾向于相信：", a: [{ l: "眼见为实，经验可靠", v: "S" }, { l: "直觉和灵感带来的启发", v: "N" }, { l: "经过验证的事实", v: "S" }, { l: "内心的预感与洞见", v: "N" }] },
-      { t: "你更看重一个人的：", a: [{ l: "能力和逻辑清晰度", v: "T" }, { l: "善良和情感细腻度", v: "F" }, { l: "公正和原则性", v: "T" }, { l: "同理心和包容度", v: "F" }] },
-      { t: "对于未完成的任务，你：", a: [{ l: "感到不安，想尽快完成", v: "J" }, { l: "觉得可以灵活处理，不着急", v: "P" }, { l: "会制定计划逐步完成", v: "J" }, { l: "先放一放，等状态好了再做", v: "P" }] },
-      { t: "你更常：", a: [{ l: "先行动，再思考", v: "E" }, { l: "先思考，再行动", v: "I" }, { l: "边做边说，享受互动", v: "E" }, { l: "想清楚再表达", v: "I" }] },
-      { t: "你更容易被什么说服？", a: [{ l: "数据和案例", v: "S" }, { l: "理念和愿景", v: "N" }, { l: "真实发生的事例", v: "S" }, { l: "富有想象力的蓝图", v: "N" }] },
-      { t: "你更愿意成为：", a: [{ l: "公正的裁判", v: "T" }, { l: "温暖的倾听者", v: "F" }, { l: "客观的分析者", v: "T" }, { l: "贴心的支持者", v: "F" }] },
-      { t: "你更喜欢做：", a: [{ l: "已经知道怎么做的事", v: "J" }, { l: "需要即兴发挥的事", v: "P" }, { l: "有明确步骤的任务", v: "J" }, { l: "充满变数的挑战", v: "P" }] },
-      { t: "独处时，你感到：", a: [{ l: "有时无聊，想找人说话", v: "E" }, { l: "非常自在，享受安静", v: "I" }, { l: "过一会儿就想联系朋友", v: "E" }, { l: "觉得是宝贵的休息时间", v: "I" }] },
-      { t: "你更关注：", a: [{ l: "当下正在发生的事", v: "S" }, { l: "未来可能发生的事", v: "N" }, { l: "眼前的实际问题", v: "S" }, { l: "长远的发展趋势", v: "N" }] },
-      { t: "当团队出现分歧，你更倾向于：", a: [{ l: "提出一个最理性的方案", v: "T" }, { l: "协调各方情绪，达成共识", v: "F" }, { l: "分析利弊，选出最优解", v: "T" }, { l: "照顾每个人的感受", v: "F" }] },
-      { t: "你更习惯：", a: [{ l: "提前做好计划", v: "J" }, { l: "随机应变", v: "P" }, { l: "列出待办事项清单", v: "J" }, { l: "根据当天状态调整", v: "P" }] },
-      { t: "你更愿意：", a: [{ l: "在热闹中寻找乐趣", v: "E" }, { l: "在安静中寻找深度", v: "I" }, { l: "参加聚会拓展人脉", v: "E" }, { l: "一个人读书或思考", v: "I" }] },
-      { t: "你更相信：", a: [{ l: "实践出真知", v: "S" }, { l: "想象力驱动世界", v: "N" }, { l: "亲身经历最可靠", v: "S" }, { l: "灵感比经验更重要", v: "N" }] },
-      { t: "你认为更重要的是：", a: [{ l: "公平", v: "T" }, { l: "仁慈", v: "F" }, { l: "规则面前人人平等", v: "T" }, { l: "体谅每个人的难处", v: "F" }] },
-      { t: "你更享受：", a: [{ l: "完成一个长期计划", v: "J" }, { l: "探索多个新的可能", v: "P" }, { l: "按部就班推进目标", v: "J" }, { l: "同时尝试不同方向", v: "P" }] },
-      { t: "你更容易：", a: [{ l: "在人群中感到兴奋", v: "E" }, { l: "在独处中恢复精力", v: "I" }, { l: "通过交流理清思路", v: "E" }, { l: "通过沉思获得答案", v: "I" }] },
-      { t: "你更依赖：", a: [{ l: "经验和事实", v: "S" }, { l: "灵感和直觉", v: "N" }, { l: "过去成功的做法", v: "S" }, { l: "内心的指引", v: "N" }] },
-      { t: "你更看重：", a: [{ l: "逻辑的严密性", v: "T" }, { l: "情感的真诚性", v: "F" }, { l: "论证是否合理", v: "T" }, { l: "是否发自内心", v: "F" }] },
-      { t: "你更倾向于：", a: [{ l: "按计划行事", v: "J" }, { l: "保持开放选项", v: "P" }, { l: "提前确定目标", v: "J" }, { l: "走一步看一步", v: "P" }] },
-      { t: "你更喜欢：", a: [{ l: "成为焦点", v: "E" }, { l: "做幕后的支持者", v: "I" }, { l: "在台前表达观点", v: "E" }, { l: "在背后默默付出", v: "I" }] },
-      { t: "你更容易注意到：", a: [{ l: "事物的实际用途", v: "S" }, { l: "事物背后的意义", v: "N" }, { l: "具体的使用方法", v: "S" }, { l: "象征和隐喻", v: "N" }] },
-      { t: "你更愿意：", a: [{ l: "用逻辑说服别人", v: "T" }, { l: "用情感打动别人", v: "F" }, { l: "摆事实讲道理", v: "T" }, { l: "讲故事引发共鸣", v: "F" }] },
-      { t: "你更享受：", a: [{ l: "按部就班的稳定", v: "J" }, { l: "灵活多变的自由", v: "P" }, { l: "清晰的规则和节奏", v: "J" }, { l: "随性的节奏和空间", v: "P" }] },
-      { t: "你更认同：", a: [{ l: "行动胜于言语", v: "E" }, { l: "思考胜于行动", v: "I" }, { l: "多交流才能碰撞火花", v: "E" }, { l: "安静思考才能深入", v: "I" }] }
-    ];
-
     const branchPrefixes = [
-      "当事情进展顺利时，", "当事情陷入僵局时，", "在压力很大的时候，",
-      "面对陌生人的时候，", "和家人相处的时候，", "独自做重要选择时，",
-      "被别人误解时，", "获得意外机会时，", "需要妥协的时候，",
-      "回顾过去的时候，", "想象未来的时候，", "在人群中感到疲惫时，",
-      "需要快速反应时，", "需要长期坚持时，", "面对规则的时候，",
-      "面对情感冲突时，", "在兴趣和现实之间，", "当朋友求助时，",
-      "当计划被打乱时，", "当获得认可时"
+      "当事情进展顺利时，", "当事情陷入僵局时，", "在压力很大的时候，", "面对陌生人的时候，", "和家人相处的时候，", "独自做重要选择时，",
+      "被别人误解时，", "获得意外机会时，", "需要妥协的时候，", "回顾过去的时候，", "想象未来的时候，", "在人群中感到疲惫时，",
+      "需要快速反应时，", "需要长期坚持时", "面对规则的时候，", "面对情感冲突时，", "在兴趣和现实之间，", "当朋友求助时，",
+      "当计划被打乱时，", "当获得认可时", "在深夜独处时", "在社交场合中", "面对未知挑战时", "在亲密关系中", "在工作遇到瓶颈时"
     ];
-
     let idx = 0;
     while (result.length < 200) {
-      const tpl = templates[idx % templates.length];
-      const round = Math.floor(idx / templates.length);
-      let prefix = "";
-      if (round < branchPrefixes.length) {
-        prefix = branchPrefixes[round];
-      } else {
-        prefix = "在更深层的情境中（" + (round + 1) + "）：";
-      }
-      result.push({
-        text: prefix + tpl.t,
-        options: tpl.a.map(o => ({ label: o.l, value: o.v }))
-      });
+      const tpl = SIMPLE_BASE[idx % SIMPLE_BASE.length];
+      const round = Math.floor(idx / SIMPLE_BASE.length);
+      let prefix = round < branchPrefixes.length ? branchPrefixes[round] : "在更深层的情境中（" + (round + 1) + "）：";
+      result.push({ text: prefix + tpl.text, options: tpl.options });
       idx++;
     }
     return result;
@@ -381,43 +228,137 @@
     ESFP: { title: "表演者", tag: "热情洋溢的当下享受者" }
   };
 
-  const STORAGE_KEY = 'mbti_64_history_v1';
+  const STORAGE_KEY = 'mbti_64_history_v6';
 
-  function shuffle(arr) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
+  // ==========================================
+  // 动态解析引擎（根据具体百分比生成海量句子）
+  // ==========================================
+  function generateDynamicText(type, variant, counts, version) {
+    const info = TYPE_DESC[type] || { title: '探索者', tag: '独特的人格组合' };
+    const pE = Math.round((counts.E / (counts.E + counts.I)) * 100) || 0;
+    const pI = 100 - pE;
+    const pS = Math.round((counts.S / (counts.S + counts.N)) * 100) || 0;
+    const pN = 100 - pS;
+    const pT = Math.round((counts.T / (counts.T + counts.F)) * 100) || 0;
+    const pF = 100 - pT;
+    const pJ = Math.round((counts.J / (counts.J + counts.P)) * 100) || 0;
+    const pP = 100 - pJ;
+
+    let html = `<h3>【基础画像】你是 ${variant}</h3>
+      <p>你属于 <strong>${type}</strong> 家族（${info.title}），你的细分变体是 <strong>${variant}</strong>。
+      ${variant.endsWith('-A') ? '你在各个维度上的偏好相对均衡，这让你具备极强的适应能力，能在不同场景中灵活切换。' : (variant.endsWith('-T') ? '你在各个维度上都表现出了极端的固执，这让你拥有极其鲜明的个性，但也容易陷入偏执。' : '你在某些维度上表现出极其强烈的偏好，而在其他维度上则留有弹性和余地。')}
+      基于你独特的得分比例，以下是完全为你定制的深度解析。</p>`;
+
+    // 1. 能量维度深度解析（根据具体数字动态生成文案）
+    html += `<h3>【能量源】E/I 维度（外向 ${pE}% : 内向 ${pI}%）</h3>`;
+    if (pE >= 85) {
+      html += `<p>你是一个<strong>极度外向</strong>的人（E 维度高达 ${pE}%）。你的能量如同太阳一般向外辐射，你极度渴望与人互动，害怕孤独。在人群中，你总是那个最活跃、最能带动气氛的人。对你来说，没有社交的生活就像是没有氧气的房间。然而，这种极度的外向也可能让你在需要静下心来深度思考时感到困难，甚至会因为过度依赖外界反馈而迷失自我。</p>`;
+    } else if (pE >= 65) {
+      html += `<p>你是一个<strong>偏向外向</strong>的人（E 维度占 ${pE}%）。你喜欢与人打交道，善于表达，能从外部世界获得能量。但你并不排斥独处，偶尔的安静能帮你理清思绪。在团队中，你是很好的沟通者。</p>`;
+    } else if (pI >= 85) {
+      html += `<p>你是一个<strong>极度内向</strong>的人（I 维度高达 ${pI}%）。你的内心世界是一座深邃的城堡，只有少数人能拿到钥匙。你极度需要独处的时间和空间来恢复精力。喧闹的社交场合会让你感到极度疲惫，甚至引发感官过载。你不是冷漠，只是你的能量电池容量较小，经不起无意义的消耗。你的深度思考能力极强，但在向外界表达时往往显得迟缓。</p>`;
+    } else if (pI >= 65) {
+      html += `<p>你是一个<strong>偏向内向</strong>的人（I 维度占 ${pI}%）。你在独处中充电，喜欢安静、深度的交流。你有自己的节奏，不会被外界的喧嚣轻易打乱。在人群中，你更像是一个安静的观察者。</p>`;
+    } else {
+      html += `<p>你在 E（${pE}%）和 I（${pI}%）之间保持着<strong>完美的平衡</strong>。这意味着你是一个中间性格者（Ambivert），你可以在热闹的社交和独处的宁静之间自如切换。这赋予了你极大的适应力，但也可能让你在社交后感到矛盾的疲劳感。</p>`;
     }
-    return a;
-  }
 
-  function prepareQuestions(base, count) {
-    let pool = base.slice();
-    if (pool.length < count) {
-      const extra = [];
-      let i = 0;
-      while (pool.length + extra.length < count) {
-        const q = base[i % base.length];
-        extra.push({
-          text: "换个角度：" + q.text,
-          options: q.options.map(o => ({ label: o.label, value: o.value }))
-        });
-        i++;
-      }
-      pool = pool.concat(extra);
+    // 2. 信息维度深度解析
+    html += `<h3>【信息雷达】S/N 维度（实感 ${pS}% : 直觉 ${pN}%）</h3>`;
+    if (pS >= 85) {
+      html += `<p>你是一个<strong>极度务实</strong>的人（S 维度高达 ${pS}%）。你只相信眼睛看到的、手摸到的、真实发生的事物。你对细节的把控能力极强，是典型的“脚踏实地”的人。你对那些虚无缥缈的假设、形而上的哲学思考感到索然无味。你的执行力很强，但也容易被过往的经验所困，在面临行业巨变时，可能会因为缺乏对未来的想象力而遭遇危机。</p>`;
+    } else if (pS >= 65) {
+      html += `<p>你是一个<strong>偏向实感</strong>的人（S 维度占 ${pS}%）。你关注现实和当下，注重事实和细节。在做事情时，你倾向于按部就班，稳扎稳打。你是一个靠谱的实干家。</p>`;
+    } else if (pN >= 85) {
+      html += `<p>你是一个<strong>极度直觉</strong>的人（N 维度高达 ${pN}%）。你的大脑永远在高速运转，你总是能看到事物背后的关联、隐喻和未来的无限可能。你讨厌繁琐的细节，渴望宏观的蓝图。你极具创造力，是天生的梦想家和发明家。然而，你的想法有时过于超前，导致落地执行时困难重重，甚至被人误解为“不切实际”。</p>`;
+    } else if (pN >= 65) {
+      html += `<p>你是一个<strong>偏向直觉</strong>的人（N 维度占 ${pN}%）。你喜欢探索未来的可能性，富有想象力。你不满足于表面的现象，总是想挖掘事物背后的深层意义。你适合从事需要创意和洞察力的工作。</p>`;
+    } else {
+      html += `<p>你在 S（${pS}%）和 N（${pN}%）之间保持着<strong>难得的平衡</strong>。你既能关注到现实的细节，又能洞察未来的趋势。你能够在“仰望星空”和“脚踏实地”之间找到绝佳的平衡点。</p>`;
     }
-    const shuffled = shuffle(pool).slice(0, count);
-    return shuffled.map(q => ({
-      text: q.text,
-      options: shuffle(q.options).map(o => ({ label: o.label, value: o.value }))
-    }));
-  }
 
-  function getVersionQuestions(version) {
-    if (version === 40) return prepareQuestions(SIMPLE_BASE, 40);
-    if (version === 100) return prepareQuestions(NORMAL_BASE, 100);
-    return prepareQuestions(DEEP_BASE, 200);
+    // 3. 决策维度深度解析
+    html += `<h3>【决策天平】T/F 维度（思考 ${pT}% : 情感 ${pF}%）</h3>`;
+    if (pT >= 85) {
+      html += `<p>你是一个<strong>极度理性</strong>的人（T 维度高达 ${pT}%）。你用逻辑统治生活，对错分明。在遇到问题时，你第一时间想到的是如何高效地解决问题，而不是照顾谁的情绪。你可以在极度高压的环境下保持冷酷和理智，这让你在职场上极具竞争力。但在人际交往中，你的这种“冷血”往往会刺伤亲近的人，让人感到难以靠近。</p>`;
+    } else if (pT >= 65) {
+      html += `<p>你是一个<strong>偏向理性</strong>的人（T 维度占 ${pT}%）。你讲究客观和公平，善于分析利弊。你能理性地看待问题，不容易被情绪左右。</p>`;
+    } else if (pF >= 85) {
+      html += `<p>你是一个<strong>极度感性</strong>的人（F 维度高达 ${pF}%）。你拥有一颗极其柔软和敏锐的心，你的共情能力几乎超载。你总是把别人的感受放在第一位，甚至愿意为此牺牲自己的利益。你能敏锐地察觉到空气中哪怕极其微小的情绪变化。但这也让你极易被消耗，容易为了维持表面的和谐而无限退让，最终变成一个内耗严重的“讨好型人格”。</p>`;
+    } else if (pF >= 65) {
+      html += `<p>你是一个<strong>偏向感性</strong>的人（F 维度占 ${pF}%）。你讲究人情世故，注重人际和谐。在做决定时，你会更多地去考虑他人的处境和感受。</p>`;
+    } else {
+      html += `<p>你在 T（${pT}%）和 F（${pF}%）之间保持着<strong>完美的平衡</strong>。你既不是冷血无情的机器，也不是会被情绪淹没的傻瓜。你能够在逻辑和情感之间自如切换，这让你在处理复杂的人际关系和重大决策时，既有原则，又有温度。</p>`;
+    }
+
+    // 4. 生活维度深度解析
+    html += `<h3>【生活节奏】J/P 维度（判断 ${pJ}% : 知觉 ${pP}%）</h3>`;
+    if (pJ >= 85) {
+      html += `<p>你是一个<strong>极度喜欢掌控</strong>的人（J 维度高达 ${pJ}%）。你的日程表必须排得满满当当，你的房间必须井井有条。你极度厌恶不确定性和突发事件，你希望一切都在自己的计划和掌控之中。极高的执行力是你的王牌。然而，你的控制欲有时会让身边的人窒息，你也无法应对人生中那些无法预测的黑天鹅事件。</p>`;
+    } else if (pJ >= 65) {
+      html += `<p>你是一个<strong>偏向计划</strong>的人（J 维度占 ${pJ}%）。你做事有条理，喜欢提前做好准备。你不喜欢拖延，追求效率和结果。</p>`;
+    } else if (pP >= 85) {
+      html += `<p>你是一个<strong>极度随性</strong>的人（P 维度高达 ${pP}%）。你讨厌被规则束缚，喜欢随心所欲地生活。你适应力极强，总能在混乱中找到出路。但这也会让你在最后期限前疯狂赶工，甚至因为缺乏长远规划而陷入人生的停滞。</p>`;
+    } else if (pP >= 65) {
+      html += `<p>你是一个<strong>偏向随性</strong>的人（P 维度占 ${pP}%）。你喜欢灵活和自由，讨厌死板的计划。你能很好地应对突发情况，享受生活中的小惊喜。</p>`;
+    } else {
+      html += `<p>你在 J（${pJ}%）和 P（${pP}%）之间保持着<strong>极佳的平衡</strong>。你既能制定合理的计划，又能根据实际情况灵活调整。你不会因为计划被打乱而崩溃，也不会因为缺乏计划而陷入混乱。</p>`;
+    }
+
+    if (version === 40) {
+      return html + `<p>总结：以上是你人格的基本盘。接纳自己的底色，是你走向成熟的第一步。</p>`;
+    }
+
+    // 5. 情感与人际模式（普通版、深度版）
+    html += `<h3>【亲密关系】如何爱与被爱</h3>`;
+    if (pT >= 70 && pE >= 60) {
+      html += `<p>在感情中，你是一个热情但强势的人。你习惯用逻辑去经营关系，遇到矛盾喜欢当场讲清楚。你的直白可能会让伴侣觉得不够温柔，但你的责任心很强。你需要学会在讲道理之前，先抱抱对方。</p>`;
+    } else if (pF >= 70 && pI >= 60) {
+      html += `<p>在感情中，你是一个极其深情但被动的人。你的内心戏极多，渴望灵魂伴侣，但绝不轻易主动。你极其在意伴侣的情绪，容易因为对方的一句话陷入内耗。你需要勇敢表达自己的需求，而不是等待对方来猜。</p>`;
+    } else if (pN >= 70 && pP >= 60) {
+      html += `<p>在感情中，你追求浪漫和自由。你讨厌被关系束缚，喜欢顺其自然。你很容易被有趣的人吸引，但也容易因为缺乏安全感而随时准备撤退。你需要找到那个能给你足够空间，又能接住你奇思妙想的人。</p>`;
+    } else if (pS >= 70 && pJ >= 60) {
+      html += `<p>在感情中，你是一个非常踏实、可靠的伴侣。你不太会说甜言蜜语，但会用实际行动去照顾对方。你注重生活的秩序和稳定，一旦承诺，就会负责到底。</p>`;
+    } else {
+      html += `<p>在感情中，你是一个既需要亲密又需要独立的人。你能在理性和感性之间找到平衡，既能给予对方关怀，又能保持自己的边界。你理想的伴侣是那种能和你进行深度对话，又能尊重你个人空间的人。</p>`;
+    }
+
+    // 6. 职场与做事风格
+    html += `<h3>【职场生存】你的优势与破局</h3>`;
+    if (pN >= 70 && pT >= 60) {
+      html += `<p>在职场中，你是一个战略型人才。你能看透行业的未来趋势，擅长制定宏观的规划。你讨厌重复枯燥的工作，适合从事需要战略眼光和创新思维的工作，如咨询、企划、研发。但你需要警惕自己过分追求完美概念，而忽略了落地执行。你需要找一个执行能力强的搭档来配合你。</p>`;
+    } else if (pS >= 70 && pJ >= 60) {
+      html += `<p>在职场中，你是一个完美的执行者。你做事严谨、注重细节、遵守规则。你是团队里最靠谱的定海神针。你适合从事财务、行政、工程等需要极高精准度和流程化的工作。但你需要警惕时代变化时，自己的经验会成为阻碍。你需要保持对新事物的好奇心。</p>`;
+    } else if (pF >= 70 && pE >= 60) {
+      html += `<p>在职场中，你是一个团队的润滑剂和气氛担当。你善于沟通，能够敏锐地察觉同事的需求，擅长协调人际冲突。你适合从事HR、公关、教育、销售等需要高频人际互动的工作。但你需要学会拒绝，不要因为太顾及别人的面子而接下不属于自己的工作。</p>`;
+    } else if (pI >= 70 && pT >= 60) {
+      html += `<p>在职场中，你是一个冷静的独立思考者。你不需要太多社交，能够独自完成高难度的深度工作。你适合从事技术、研究、数据分析等需要高度专注的工作。但你需要学会如何向非专业人士解释你的工作成果，不要让自己成为一个隐形的孤岛。</p>`;
+    } else {
+      html += `<p>在职场中，你是一个极具灵活性的人。你能在团队合作和独立工作之间自如切换。你既能看到大局，又能关注细节。你适合从事项目管理工作，能够将不同人的力量整合到一起。</p>`;
+    }
+
+    if (version === 100) {
+      return html + `<p>以上是为你量身定制的深度解析。接受自己的长板，修补自己的短板，你会走得更远。</p>`;
+    }
+
+    // 7. 深度版特供：压力与阴影、成长进阶
+    html += `<h3>【深渊凝视】压力下的阴影与防御</h3>`;
+    if (pE >= 70 && pF >= 60) {
+      html += `<p>当你遇到巨大压力时，你平时那种热情、善解人意的面具可能会碎裂。你可能会突然变得极其冷漠，切断一切社交，把自己关在房间里，谁也不想见。或者，你可能会走向另一个极端：疯狂地向外界索取情绪价值，不断抱怨，像一个巨大的情绪黑洞。你需要警惕这种“情绪吸血”的倾向，学会自我安抚。</p>`;
+    } else if (pI >= 70 && pT >= 60) {
+      html += `<p>在高压下，你平时冷静理智的防线可能会崩溃。你可能会陷入极度的自我怀疑，或者变得极其刻薄挑剔，对周围的人指指点点。你甚至可能会突然爆发，做出毫无逻辑的破坏性行为。你需要学会在压力来临时，向他人求助，而不是一个人死扛。</p>`;
+    } else if (pJ >= 70 && pS >= 60) {
+      html += `<p>在极端压力下，你可能会陷入一种“强迫症”式的失控。你会疯狂地打扫卫生、整理文件，试图通过控制微小的环境来获得安全感。如果事情依然脱离掌控，你可能会彻底摆烂，瘫在床上什么也不做。你需要学会接受不完美和不确定性，偶尔让一切乱一点也没关系。</p>`;
+    } else {
+      html += `<p>在压力下，你的心理防御机制会被触发。你可能会产生逃避现实的冲动，沉溺于虚拟世界、暴饮暴食，或者疯狂消费。你需要建立一个健康的解压渠道，比如运动、冥想，而不是用短期快感来麻痹自己。</p>`;
+    }
+
+    html += `<h3>【终极命题】你的成长与破局之路</h3>`;
+    html += `<p>作为 ${variant}，你的一生都在追求内心的平静与外界的平衡。你最大的敌人，从来不是别人，而是那个不敢面对真实自我的自己。</p>`;
+    html += `<p>你需要刻意练习你的劣势功能。如果你平时 ${pE >= 60 ? '太习惯于向外社交，那么请试着给自己留出独处的时间，去阅读，去思考，去面对内心的空虚' : '太习惯于向内自我封闭，那么请试着走出去，去接触不同的人，去感受外面的世界，哪怕只是去楼下散个步'}。</p>`;
+    html += `<p>不要害怕自己的阴暗面。你的嫉妒、愤怒、脆弱，都是你人性的一部分。只有接纳了完整的自己，你才能真正走向人格的整合，成为一个既强大又温柔的人。</p>`;
+
+    return html;
   }
 
   let currentVersion = 40;
@@ -444,6 +385,39 @@
   const mainHistoryList = document.getElementById('mainHistoryList');
   const mainHistoryClear = document.getElementById('mainHistoryClear');
   const versionTabs = document.querySelectorAll('.version-tab');
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function prepareQuestions(base, count) {
+    let pool = base.slice();
+    if (pool.length < count) {
+      const extra = [];
+      let i = 0;
+      while (pool.length + extra.length < count) {
+        const q = base[i % base.length];
+        extra.push({ text: "换个情境：" + q.text, options: q.options.map(o => ({ label: o.label, value: o.value })) });
+        i++;
+      }
+      pool = pool.concat(extra);
+    }
+    return shuffle(pool).slice(0, count).map(q => ({
+      text: q.text,
+      options: shuffle(q.options).map(o => ({ label: o.label, value: o.value }))
+    }));
+  }
+
+  function getVersionQuestions(version) {
+    if (version === 40) return prepareQuestions(SIMPLE_BASE, 40);
+    if (version === 100) return prepareQuestions(NORMAL_BASE, 100);
+    return prepareQuestions(DEEP_BASE, 200);
+  }
 
   function resetState(version) {
     currentVersion = version;
@@ -516,8 +490,7 @@
   function calculate() {
     const counts = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
     answers.forEach(v => { if (v && counts.hasOwnProperty(v)) counts[v]++; });
-    
-    const total = answers.length;
+    const total = answers.length || 1;
     
     const e = counts.E >= counts.I ? 'E' : 'I';
     const s = counts.S >= counts.N ? 'S' : 'N';
@@ -525,23 +498,15 @@
     const j = counts.J >= counts.P ? 'J' : 'P';
     
     let suffix = '';
-    if (e === 'E' && counts.E / total > 0.7) suffix += 'E';
-    if (e === 'I' && counts.I / total > 0.7) suffix += 'I';
-    if (s === 'S' && counts.S / total > 0.7) suffix += 'S';
-    if (s === 'N' && counts.N / total > 0.7) suffix += 'N';
-    if (t === 'T' && counts.T / total > 0.7) suffix += 'T';
-    if (t === 'F' && counts.F / total > 0.7) suffix += 'F';
-    if (j === 'J' && counts.J / total > 0.7) suffix += 'J';
-    if (j === 'P' && counts.P / total > 0.7) suffix += 'P';
+    if (counts[e] / total > 0.7) suffix += e;
+    if (counts[s] / total > 0.7) suffix += s;
+    if (counts[t] / total > 0.7) suffix += t;
+    if (counts[j] / total > 0.7) suffix += j;
     
-    if (suffix.length === 0) {
-      suffix = 'A';
-    } else if (suffix.length === 4) {
-      suffix = 'T';
-    }
+    if (suffix.length === 0) suffix = 'A';
+    else if (suffix.length === 4) suffix = 'T';
     
-    const type = e + s + t + j;
-    return { type, variant: type + '-' + suffix, counts };
+    return { type: e + s + t + j, variant: e + s + t + j + '-' + suffix, counts };
   }
 
   function renderDims(counts) {
@@ -556,29 +521,24 @@
       { left: 'J', right: 'P', l: (counts.J / totalJP) * 100 }
     ];
     dimsBar.innerHTML = dims.map(d => (
-      '<div class="dim-row">' +
-        '<span class="dim-label">' + d.left + ' ' + d.right + '</span>' +
-        '<div class="dim-track">' +
-          '<div class="dim-fill-left" style="width:' + d.l + '%"></div>' +
-          '<div class="dim-fill-right" style="width:' + (100 - d.l) + '%"></div>' +
-        '</div>' +
-        '<span class="dim-pct">' + Math.round(d.l) + '%</span>' +
-      '</div>'
+      `<div class="dim-row">
+        <span class="dim-label">${d.left} ${d.right}</span>
+        <div class="dim-track">
+          <div class="dim-fill-left" style="width:${d.l}%"></div>
+          <div class="dim-fill-right" style="width:${100 - d.l}%"></div>
+        </div>
+        <span class="dim-pct">${Math.round(d.l)}%</span>
+      </div>`
     )).join('');
   }
 
-  function saveToHistory(variant, version, counts) {
+  function saveToHistory(variant, version, counts, descHtml) {
     let history = [];
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) history = JSON.parse(raw);
     } catch (e) { history = []; }
-    history.unshift({
-      variant,
-      version,
-      counts,
-      time: new Date().toLocaleString('zh-CN')
-    });
+    history.unshift({ variant, version, counts, descHtml, time: new Date().toLocaleString('zh-CN') });
     if (history.length > 20) history = history.slice(0, 20);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch (e) {}
   }
@@ -593,13 +553,35 @@
       mainHistoryList.innerHTML = '<div class="history-empty">暂无历史记录</div>';
       return;
     }
-    mainHistoryList.innerHTML = history.map(h => (
-      '<div class="history-item">' +
-        '<span class="h-type">' + h.variant + '</span>' +
-        '<span class="h-meta">' + h.version + '题 · ' + h.time + '</span>' +
+    mainHistoryList.innerHTML = history.map((h, index) => (
+      '<div class="history-item" onclick="window.viewHistoryItem(' + index + ')">' +
+        '<span class="h-type">' + h.variant + ' <span style="font-size:0.8rem;font-weight:normal;color:#6b7d8f;">(' + h.version + '题)</span></span>' +
+        '<span class="h-meta">' + h.time + ' 点击查看解析</span>' +
       '</div>'
     )).join('');
   }
+
+  window.viewHistoryItem = function(index) {
+    let history = [];
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) history = JSON.parse(raw);
+    } catch (e) { history = []; }
+    const item = history[index];
+    if (!item) return;
+    
+    const info = TYPE_DESC[item.variant.substring(0, 4)] || { title: '探索者', tag: '独特的人格组合' };
+    resultType.textContent = item.variant;
+    resultTitle.textContent = info.title;
+    resultTagline.textContent = info.tag;
+    renderDims(item.counts);
+    resultDesc.innerHTML = item.descHtml;
+    
+    quizArea.classList.add('hidden');
+    resultArea.classList.remove('hidden');
+    mainHistorySection.classList.add('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   function showResult() {
     if (answers.some(a => a === null)) {
@@ -618,30 +600,13 @@
     resultTagline.textContent = info.tag;
     renderDims(counts);
     
-    let variantDesc = '';
-    if (variant.endsWith('-A')) {
-      variantDesc = '你在四个维度上的倾向相对均衡，没有某一项表现出极端的偏好。这让你在不同情境下都能游刃有余，但也可能让你在做决定时感到纠结。你是一个「适应型」的变体，擅长在多变的环境中找到平衡。';
-    } else if (variant.endsWith('-T')) {
-      variantDesc = '你在四个维度上都有着非常强烈的偏好，几乎在所有情境下都表现出极端的一致性。这让你的人格特征极其鲜明，适合深耕特定的领域，但也可能让你在面对不同观点时显得固执。你是一个「坚定型」的变体，几乎不可能被改变。';
-    } else {
-      variantDesc = '你在某些维度上表现出非常强烈的偏好（>70%），而在其他维度上则相对温和。这让你既有人格上的鲜明特点，又保留了适应环境的弹性。你是一个「复合型」的变体，既知道自己要什么，也不排斥其他可能性。';
-    }
-
-    resultDesc.innerHTML = '<p>你的基础类型是 <strong>' + type + '</strong>（' + info.title + '），细分变体为 <strong>' + variant + '</strong>。</p>' +
-      '<p>' + variantDesc + '</p>' +
-      '<h3>维度倾向详解</h3>' +
-      '<p>' +
-      'E/I 维度：<strong>' + (counts.E >= counts.I ? '外向 E' : '内向 I') + '</strong>（E ' + counts.E + ' / I ' + counts.I + '，倾向度 ' + Math.round((counts.E >= counts.I ? counts.E / (counts.E + counts.I) : counts.I / (counts.E + counts.I)) * 100) + '%）<br>' +
-      'S/N 维度：<strong>' + (counts.S >= counts.N ? '实感 S' : '直觉 N') + '</strong>（S ' + counts.S + ' / N ' + counts.N + '，倾向度 ' + Math.round((counts.S >= counts.N ? counts.S / (counts.S + counts.N) : counts.N / (counts.S + counts.N)) * 100) + '%）<br>' +
-      'T/F 维度：<strong>' + (counts.T >= counts.F ? '思考 T' : '情感 F') + '</strong>（T ' + counts.T + ' / F ' + counts.F + '，倾向度 ' + Math.round((counts.T >= counts.F ? counts.T / (counts.T + counts.F) : counts.F / (counts.T + counts.F)) * 100) + '%）<br>' +
-      'J/P 维度：<strong>' + (counts.J >= counts.P ? '判断 J' : '知觉 P') + '</strong>（J ' + counts.J + ' / P ' + counts.P + '，倾向度 ' + Math.round((counts.J >= counts.P ? counts.J / (counts.J + counts.P) : counts.P / (counts.J + counts.P)) * 100) + '%）' +
-      '</p>' +
-      '<h3>关于 64 人格测试</h3>' +
-      '<p>传统的 MBTI 16 型人格只看四个字母的组合，但人在每个维度上的「强烈程度」是不同的。64 人格测试通过观察你在每个维度上的倾向度，为你加上了一个后缀，从而细分出 64 种亚型。这能帮你更精准地理解自己的行为模式。</p>';
+    const descHtml = generateDynamicText(type, variant, counts, currentVersion);
+    resultDesc.innerHTML = descHtml;
       
     quizArea.classList.add('hidden');
     resultArea.classList.remove('hidden');
-    saveToHistory(variant, currentVersion, counts);
+    saveToHistory(variant, currentVersion, counts, descHtml);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function restartTest() {
@@ -650,6 +615,7 @@
     resultArea.classList.add('hidden');
     quizArea.classList.remove('hidden');
     renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   versionTabs.forEach(tab => {

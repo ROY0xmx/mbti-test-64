@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="light only">
-<title>MBTI 64人格 · 终极测试</title>
+<title>MBTI 64人格 · 三阶测试</title>
 <style>
   html { color-scheme: light only; background: #f5f5f5; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -89,12 +89,14 @@
 </head>
 <body>
 <div class="test-container">
-  <h1>MBTI 64人格 · 普通版</h1>
-  <div class="subhead">16型人格亚型 · 动态万字级解析</div>
+  <h1>MBTI 64人格 · 三阶测试</h1>
+  <div class="subhead">16型人格亚型 · 40 / 100 / 200 题动态深度解析</div>
 
   <div class="top-bar">
     <div class="version-tabs">
-      <button class="version-tab active" data-version="100">普通版 <span class="badge">100题</span></button>
+      <button class="version-tab active" data-version="40">极简版 <span class="badge">40题</span></button>
+      <button class="version-tab" data-version="100">普通版 <span class="badge">100题</span></button>
+      <button class="version-tab" data-version="200">深度思考版 <span class="badge">200题</span></button>
     </div>
     <button class="history-toggle" id="mainHistoryToggle">历史记录</button>
   </div>
@@ -109,7 +111,7 @@
 
   <div id="quizArea">
     <div class="progress-area">
-      <span class="question-counter" id="counter">1 / 100</span>
+      <span class="question-counter" id="counter">1 / 40</span>
       <div class="progress-bar-bg"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
     </div>
     <div class="question-text" id="questionText">正在加载...</div>
@@ -122,8 +124,8 @@
 
   <div id="resultArea" class="result-screen hidden">
     <div class="result-header">
-      <div class="result-type" id="resultType">INFP-A</div>
-      <div class="result-title" id="resultTitle">调停者</div>
+      <div class="result-type" id="resultType">—</div>
+      <div class="result-title" id="resultTitle">—</div>
       <div class="result-tagline" id="resultTagline"></div>
     </div>
     <div class="dims-bar" id="dimsBar"></div>
@@ -137,7 +139,53 @@
 <script>
 (function(){
   // ============================================================
-  // 100题（普通版）独立题库 —— 100道完全唯一
+  // 40题（极简版）独立题库 —— 40 条完全唯一
+  // ============================================================
+  const SIMPLE_BASE = [
+    { text: "在热闹的聚会上，你通常会：", options: [{ label: "主动和很多人打招呼，越热闹越有精神", value: "E" }, { label: "找一两个聊得来的人深入交流", value: "I" }, { label: "先观察现场，再决定要不要加入", value: "I" }, { label: "成为话题中心，带动整场气氛", value: "E" }] },
+    { text: "接手一个完全陌生的项目，你的第一步是：", options: [{ label: "先动手做，边做边找感觉", value: "S" }, { label: "先想清楚整体框架和可能的路径", value: "N" }, { label: "翻出以往类似案例照着走", value: "S" }, { label: "先 brainstorm 一堆创意方向", value: "N" }] },
+    { text: "在做重要决定时，你更信任：", options: [{ label: "数据、事实和逻辑推演", value: "T" }, { label: "自己的感受和它对他人的影响", value: "F" }, { label: "公平的规则和效率优先", value: "T" }, { label: "人情关系和整体和谐", value: "F" }] },
+    { text: "你的日常生活节奏更像：", options: [{ label: "有清晰的日程表，按部就班", value: "J" }, { label: "随性而行，看当天心情", value: "P" }, { label: "有大框架，细节灵活调整", value: "J" }, { label: "走到哪算哪，享受意外", value: "P" }] },
+    { text: "当你需要给自己“充电”时，你会选择：", options: [{ label: "约朋友出门，热闹一场", value: "E" }, { label: "一个人待着，安静看书或听歌", value: "I" }, { label: "参加集体活动，感受人群氛围", value: "E" }, { label: "独自散步、发呆或写点东西", value: "I" }] },
+    { text: "你更容易被什么吸引注意力？", options: [{ label: "具体的细节、事实和现实状况", value: "S" }, { label: "背后的模式、隐喻和未来可能", value: "N" }, { label: "眼前亟待解决的实际问题", value: "S" }, { label: "事物深层含义和长远走向", value: "N" }] },
+    { text: "当冲突发生时，你的第一反应是：", options: [{ label: "直接指出问题，就事论事", value: "T" }, { label: "先考虑对方情绪，尽量温和", value: "F" }, { label: "用事实和逻辑把道理讲清楚", value: "T" }, { label: "先安抚情绪，再慢慢沟通", value: "F" }] },
+    { text: "你的书桌或工作区更接近：", options: [{ label: "物品分类清楚，井井有条", value: "J" }, { label: "看起来有点乱，但自己找得到", value: "P" }, { label: "文件按项目或主题归档", value: "J" }, { label: "东西随手放，用时再翻", value: "P" }] },
+    { text: "你更享受哪一种对话？", options: [{ label: "聊现实生活、具体经验和操作", value: "S" }, { label: "聊抽象概念、未来设想和意义", value: "N" }, { label: "讨论实际步骤和落地方法", value: "S" }, { label: "聊理想、哲学和可能性", value: "N" }] },
+    { text: "下面哪句话你更认同？", options: [{ label: "情感是决策中不可忽视的因素", value: "F" }, { label: "公平的规则比个人感受更重要", value: "T" }, { label: "理解他人感受是首要的", value: "F" }, { label: "逻辑一致才是解决问题的关键", value: "T" }] },
+    { text: "出门旅行前，你通常会：", options: [{ label: "做详细攻略，把行程排好", value: "J" }, { label: "订好交通住宿，其他随缘", value: "P" }, { label: "列出必去景点和时间表", value: "J" }, { label: "到了再说，享受即兴探索", value: "P" }] },
+    { text: "你觉得自己更偏向：", options: [{ label: "在人群中获得能量", value: "E" }, { label: "在独处中恢复精力", value: "I" }, { label: "喜欢热闹，但也需要独处", value: "E" }, { label: "社交后需要长时间安静", value: "I" }] },
+    { text: "你更容易记住：", options: [{ label: "具体的数字、事实和细节", value: "S" }, { label: "整体印象和当时的感觉", value: "N" }, { label: "事件的经过和关键细节", value: "S" }, { label: "事情带来的启发和意义", value: "N" }] },
+    { text: "朋友向你倾诉烦恼时，你更倾向于：", options: [{ label: "帮他分析问题，给出方案", value: "T" }, { label: "先共情，让他感到被理解", value: "F" }, { label: "指出问题所在，理性建议", value: "T" }, { label: "耐心倾听，给予情感支持", value: "F" }] },
+    { text: "你更喜欢哪种工作环境？", options: [{ label: "流程清晰、截止日期明确", value: "J" }, { label: "弹性自由、可自行安排", value: "P" }, { label: "结构清楚、职责分明", value: "J" }, { label: "灵活多变、鼓励即兴", value: "P" }] },
+    { text: "在社交场合，你通常：", options: [{ label: "主动和陌生人打开话匣", value: "E" }, { label: "等别人来和你搭话", value: "I" }, { label: "很快融入群体，谈笑风生", value: "E" }, { label: "只和少数人深入交流", value: "I" }] },
+    { text: "你更倾向于相信：", options: [{ label: "眼见为实，经验最可靠", value: "S" }, { label: "直觉和灵感带来的启发", value: "N" }, { label: "经过验证的事实和数据", value: "S" }, { label: "内心的预感与洞见", value: "N" }] },
+    { text: "你更看重一个人的：", options: [{ label: "能力和逻辑清晰度", value: "T" }, { label: "善良和情感细腻度", value: "F" }, { label: "公正和原则性", value: "T" }, { label: "同理心和包容度", value: "F" }] },
+    { text: "对于还没完成的任务，你会：", options: [{ label: "感到不安，想尽快做完", value: "J" }, { label: "觉得可以灵活处理，不急", value: "P" }, { label: "制定计划逐步推进", value: "J" }, { label: "先放一放，等状态好了再做", value: "P" }] },
+    { text: "你更常是：", options: [{ label: "先行动，再思考", value: "E" }, { label: "先思考，再行动", value: "I" }, { label: "边做边说，享受互动", value: "E" }, { label: "想清楚再表达", value: "I" }] },
+    { text: "你更容易被什么说服？", options: [{ label: "数据和案例", value: "S" }, { label: "理念和愿景", value: "N" }, { label: "真实发生的事例", value: "S" }, { label: "富有想象力的蓝图", value: "N" }] },
+    { text: "你更愿意成为：", options: [{ label: "公正的裁判", value: "T" }, { label: "温暖的倾听者", value: "F" }, { label: "客观的分析者", value: "T" }, { label: "贴心的支持者", value: "F" }] },
+    { text: "你更喜欢做：", options: [{ label: "已经知道怎么做的事", value: "J" }, { label: "需要即兴发挥的事", value: "P" }, { label: "有明确步骤的任务", value: "J" }, { label: "充满变数的挑战", value: "P" }] },
+    { text: "独处的时候，你感到：", options: [{ label: "有时无聊，想找人说话", value: "E" }, { label: "非常自在，享受安静", value: "I" }, { label: "过一会儿就想联系朋友", value: "E" }, { label: "这是宝贵的休息时间", value: "I" }] },
+    { text: "你更关注：", options: [{ label: "当下正在发生的事", value: "S" }, { label: "未来可能发生的事", value: "N" }, { label: "眼前的实际问题", value: "S" }, { label: "长远的发展趋势", value: "N" }] },
+    { text: "当团队出现分歧，你更倾向于：", options: [{ label: "提出一个最理性的方案", value: "T" }, { label: "协调各方情绪，达成共识", value: "F" }, { label: "分析利弊，选出最优解", value: "T" }, { label: "照顾每个人的感受", value: "F" }] },
+    { text: "你更习惯：", options: [{ label: "提前做好计划", value: "J" }, { label: "随机应变", value: "P" }, { label: "列出待办事项清单", value: "J" }, { label: "根据当天状态调整", value: "P" }] },
+    { text: "你更愿意：", options: [{ label: "在热闹中寻找乐趣", value: "E" }, { label: "在安静中寻找深度", value: "I" }, { label: "参加聚会拓展人脉", value: "E" }, { label: "一个人读书或思考", value: "I" }] },
+    { text: "你更相信：", options: [{ label: "实践出真知", value: "S" }, { label: "想象力驱动世界", value: "N" }, { label: "亲身经历最可靠", value: "S" }, { label: "灵感比经验更重要", value: "N" }] },
+    { text: "你认为更重要的是：", options: [{ label: "公平", value: "T" }, { label: "仁慈", value: "F" }, { label: "规则面前人人平等", value: "T" }, { label: "体谅每个人的难处", value: "F" }] },
+    { text: "你更享受：", options: [{ label: "完成一个长期计划", value: "J" }, { label: "探索多个新的可能", value: "P" }, { label: "按部就班推进目标", value: "J" }, { label: "同时尝试不同方向", value: "P" }] },
+    { text: "你更容易：", options: [{ label: "在人群中感到兴奋", value: "E" }, { label: "在独处中恢复精力", value: "I" }, { label: "通过交流理清思路", value: "E" }, { label: "通过沉思获得答案", value: "I" }] },
+    { text: "你更依赖：", options: [{ label: "经验和事实", value: "S" }, { label: "灵感和直觉", value: "N" }, { label: "过去成功的做法", value: "S" }, { label: "内心的指引", value: "N" }] },
+    { text: "你更看重：", options: [{ label: "逻辑的严密性", value: "T" }, { label: "情感的真诚性", value: "F" }, { label: "论证是否合理", value: "T" }, { label: "是否发自内心", value: "F" }] },
+    { text: "你更倾向于：", options: [{ label: "按计划行事", value: "J" }, { label: "保持开放选项", value: "P" }, { label: "提前确定目标", value: "J" }, { label: "走一步看一步", value: "P" }] },
+    { text: "你更喜欢：", options: [{ label: "成为焦点", value: "E" }, { label: "做幕后的支持者", value: "I" }, { label: "在台前表达观点", value: "E" }, { label: "在背后默默付出", value: "I" }] },
+    { text: "你更容易注意到：", options: [{ label: "事物的实际用途", value: "S" }, { label: "事物背后的意义", value: "N" }, { label: "具体的使用方法", value: "S" }, { label: "象征和隐喻", value: "N" }] },
+    { text: "你更愿意：", options: [{ label: "用逻辑说服别人", value: "T" }, { label: "用情感打动别人", value: "F" }, { label: "摆事实讲道理", value: "T" }, { label: "讲故事引发共鸣", value: "F" }] },
+    { text: "你更享受：", options: [{ label: "按部就班的稳定", value: "J" }, { label: "灵活多变的自由", value: "P" }, { label: "清晰的规则和节奏", value: "J" }, { label: "随性的节奏和空间", value: "P" }] },
+    { text: "你更认同：", options: [{ label: "行动胜于言语", value: "E" }, { label: "思考胜于行动", value: "I" }, { label: "多交流才能碰撞火花", value: "E" }, { label: "安静思考才能深入", value: "I" }] }
+  ];
+
+  // ============================================================
+  // 100题（普通版）独立题库 —— 100 条完全唯一
   // ============================================================
   const NORMAL_BASE = [
     { text: "周末朋友临时约你出门，你的第一反应是：", options: [{ label: "欣然答应，正好想出去走走", value: "E" }, { label: "有点犹豫，更想按原计划休息", value: "I" }, { label: "看心情，可能去也可能不去", value: "P" }, { label: "先问清楚有哪些人再决定", value: "I" }] },
@@ -243,8 +291,257 @@
   ];
 
   // ============================================================
-  // 16型人格描述
+  // 200题（深度思考版）独立题库 —— 200 条完全唯一
   // ============================================================
+  const DEEP_BASE = [
+    { text: "深夜独自一人时，你脑海里更常浮现的是：", options: [{ label: "今天发生的一件件具体的事", value: "S" }, { label: "关于人生和未来的宏大设想", value: "N" }, { label: "某段关系里没说清楚的话", value: "F" }, { label: "某个问题还没想通的逻辑", value: "T" }] },
+    { text: "接到一个完全陌生领域的任务，你第一反应：", options: [{ label: "找模板，先照着做", value: "S" }, { label: "先想有没有颠覆性的做法", value: "N" }, { label: "找人一起讨论着推进", value: "E" }, { label: "关起门来自己研究透", value: "I" }] },
+    { text: "团队协作中，你最在意的是：", options: [{ label: "进度是否按节点推进", value: "J" }, { label: "每个人的感受是否被照顾", value: "F" }, { label: "方案逻辑是否严密", value: "T" }, { label: "有没有激发出新想法", value: "N" }] },
+    { text: "你更愿意用哪种方式让别人接受你的观点？", options: [{ label: "摆出详实的数据和事实", value: "S" }, { label: "描绘一个令人向往的愿景", value: "N" }, { label: "把因果逻辑一步步讲透", value: "T" }, { label: "先唤起对方的共情", value: "F" }] },
+    { text: "当你的计划被意外打乱时，你会：", options: [{ label: "立刻制定新的替代计划", value: "J" }, { label: "顺势而为，看看会走向哪里", value: "P" }, { label: "先抱怨几句再重新调整", value: "E" }, { label: "默默重新梳理一遍安排", value: "I" }] },
+    { text: "你更欣赏哪种类型的电影？", options: [{ label: "真实细腻的纪录片", value: "S" }, { label: "烧脑的多线科幻片", value: "N" }, { label: "催人泪下的情感片", value: "F" }, { label: "层层反转的悬疑推理", value: "T" }] },
+    { text: "在一场朋友聚会中，你更常是：", options: [{ label: "主动张罗、带动全场的人", value: "E" }, { label: "和固定一两人聊到底的人", value: "I" }, { label: "留意谁被冷落的人", value: "F" }, { label: "抛出有趣话题的人", value: "N" }] },
+    { text: "你认为一个人最重要的品质是：", options: [{ label: "可靠、守承诺", value: "J" }, { label: "善良、有同理心", value: "F" }, { label: "聪明、有逻辑", value: "T" }, { label: "开放、有想象力", value: "N" }] },
+    { text: "你更常因为什么而主动去学习？", options: [{ label: "工作需要立刻能用上", value: "S" }, { label: "好奇某个领域背后的原理", value: "N" }, { label: "想让自己更有竞争力", value: "T" }, { label: "想更好地帮助别人", value: "F" }] },
+    { text: "当别人向你提出批评时，你首先：", options: [{ label: "分析这条批评是否有道理", value: "T" }, { label: "感受对方是不是真诚", value: "F" }, { label: "回想当时具体发生了什么", value: "S" }, { label: "想到批评背后可能的深意", value: "N" }] },
+    { text: "你更愿意在什么样的领导下工作？", options: [{ label: "目标清晰、赏罚分明", value: "J" }, { label: "给予信任、放手让你做", value: "P" }, { label: "善于沟通、关心下属", value: "F" }, { label: "思路开阔、鼓励创新", value: "N" }] },
+    { text: "面对一段关系中的矛盾，你更倾向于：", options: [{ label: "把问题讲清楚、讲逻辑", value: "T" }, { label: "先照顾对方的情绪", value: "F" }, { label: "等双方都冷静了再说", value: "I" }, { label: "主动约对方当面聊", value: "E" }] },
+    { text: "你更常被什么类型的工作吸引？", options: [{ label: "有明确流程和标准", value: "S" }, { label: "需要不断创新突破", value: "N" }, { label: "能独立深度完成", value: "I" }, { label: "需要频繁与人协作", value: "E" }] },
+    { text: "在你看来，“自由”更接近于：", options: [{ label: "不受规则约束", value: "P" }, { label: "拥有更多选择权", value: "N" }, { label: "内心不被他人影响", value: "I" }, { label: "能按计划掌控生活", value: "J" }] },
+    { text: "面对一项需要长期投入的事，你会：", options: [{ label: "拆成小目标逐个完成", value: "J" }, { label: "靠兴趣推动，不想太远", value: "P" }, { label: "先评估投入产出比", value: "T" }, { label: "因为热爱所以坚持", value: "F" }] },
+    { text: "你更常怎么判断一件事值不值得做？", options: [{ label: "看它是否有实际结果", value: "S" }, { label: "看它能否带来新的可能", value: "N" }, { label: "看它是否符合原则", value: "T" }, { label: "看它是否让内心安宁", value: "F" }] },
+    { text: "在饭桌上，你更常：", options: [{ label: "主导话题，活跃气氛", value: "E" }, { label: "安静吃饭，偶尔插话", value: "I" }, { label: "留意谁被冷落", value: "F" }, { label: "聊些有深度的话题", value: "N" }] },
+    { text: "你更愿意把一次成功归因于：", options: [{ label: "扎实的经验积累", value: "S" }, { label: "独特的想法和眼光", value: "N" }, { label: "严谨的分析和判断", value: "T" }, { label: "团队的支持与信任", value: "F" }] },
+    { text: "当你需要快速做出反应时，你更依赖：", options: [{ label: "直觉和第一感觉", value: "N" }, { label: "过往类似的经验", value: "S" }, { label: "冷静的逻辑推演", value: "T" }, { label: "对他人的观察", value: "F" }] },
+    { text: "你更喜欢的休息方式是：", options: [{ label: "和朋友约饭聊天", value: "E" }, { label: "一个人宅着放空", value: "I" }, { label: "看剧刷视频图轻松", value: "S" }, { label: "看书思考图深度", value: "N" }] },
+    { text: "你更难以忍受哪种人？", options: [{ label: "做事没有条理的人", value: "J" }, { label: "冷漠不近人情的人", value: "F" }, { label: "不讲逻辑乱说的人", value: "T" }, { label: "死板没有新意的人", value: "N" }] },
+    { text: "当你在一个领域做到熟练后，你会：", options: [{ label: "继续精进成为专家", value: "S" }, { label: "寻找新的领域挑战", value: "N" }, { label: "总结方法教给别人", value: "F" }, { label: "思考如何优化效率", value: "T" }] },
+    { text: "你更愿意用什么词形容自己？", options: [{ label: "热情、爱张罗", value: "E" }, { label: "安静、有深度", value: "I" }, { label: "务实、靠得住", value: "S" }, { label: "灵性、有想法", value: "N" }] },
+    { text: "面对一项需要照顾他人感受的决定，你会：", options: [{ label: "优先考虑对大家的影响", value: "F" }, { label: "先看是否符合规则", value: "T" }, { label: "想想有没有折中方案", value: "N" }, { label: "参考过往类似处理", value: "S" }] },
+    { text: "你更常因为什么而感到骄傲？", options: [{ label: "把计划按时完成", value: "J" }, { label: "想出了一个好点子", value: "N" }, { label: "帮助他人解决了困难", value: "F" }, { label: "把一件事做到极致", value: "S" }] },
+    { text: "当你遇到一个全新的问题，你会先：", options: [{ label: "查资料找原理", value: "N" }, { label: "找类似案例参考", value: "S" }, { label: "和他人讨论", value: "E" }, { label: "自己静下来想", value: "I" }] },
+    { text: "你更愿意在什么时候与朋友联系？", options: [{ label: "开心的时候想分享", value: "E" }, { label: "难过的时候想倾诉", value: "F" }, { label: "有事的时候才联系", value: "T" }, { label: "想起来就偶尔问候", value: "I" }] },
+    { text: "你更看重一个人的：", options: [{ label: "可靠性", value: "S" }, { label: "创造力", value: "N" }, { label: "原则性", value: "T" }, { label: "温度感", value: "F" }] },
+    { text: "对于“改变”，你的态度是：", options: [{ label: "乐于接受，喜欢新鲜", value: "N" }, { label: "保持谨慎，先观察", value: "S" }, { label: "如果能让事情更好就支持", value: "T" }, { label: "如果对大家有利就支持", value: "F" }] },
+    { text: "你在做一件事时，更常：", options: [{ label: "先想好整体再动手", value: "J" }, { label: "边做边调整思路", value: "P" }, { label: "按惯例稳稳推进", value: "S" }, { label: "不断冒出新点子", value: "N" }] },
+    { text: "当你和朋友计划一次旅行，你更在意：", options: [{ label: "行程安排是否合理", value: "J" }, { label: "大家都玩得开心吗", value: "F" }, { label: "能不能探索新地方", value: "N" }, { label: "预算和实用细节", value: "S" }] },
+    { text: "你更容易被什么样的观点说服？", options: [{ label: "有数据支撑的观点", value: "S" }, { label: "有远见和想象力的观点", value: "N" }, { label: "逻辑严密自洽的观点", value: "T" }, { label: "充满人文关怀的观点", value: "F" }] },
+    { text: "你更常怎么处理和他人的分歧？", options: [{ label: "就事论事讲道理", value: "T" }, { label: "先缓和气氛再说", value: "F" }, { label: "冷静一段时间再看", value: "I" }, { label: "主动开诚布公地谈", value: "E" }] },
+    { text: "你更愿意选择一份：", options: [{ label: "稳定但略显重复的工作", value: "S" }, { label: "有挑战但充满未知的工作", value: "N" }, { label: "能掌控节奏的工作", value: "J" }, { label: "弹性自由的工作", value: "P" }] },
+    { text: "你更常因为什么而深夜难眠？", options: [{ label: "白天思虑过多", value: "N" }, { label: "某件具体事没处理好", value: "S" }, { label: "担心关系是否出问题", value: "F" }, { label: "有一个逻辑没想通", value: "T" }] },
+    { text: "在人群中，你更常是那个：", options: [{ label: "发起话题的人", value: "E" }, { label: "安静倾听的人", value: "I" }, { label: "调节气氛的人", value: "F" }, { label: "提出新角度的人", value: "N" }] },
+    { text: "你更看重一份关系里的：", options: [{ label: "稳定和陪伴", value: "S" }, { label: "思想和灵魂的碰撞", value: "N" }, { label: "公平与尊重", value: "T" }, { label: "理解与包容", value: "F" }] },
+    { text: "你更希望自己成为一个：", options: [{ label: "靠得住的人", value: "S" }, { label: "有想象力的人", value: "N" }, { label: "讲原则的人", value: "T" }, { label: "有温度的人", value: "F" }] },
+    { text: "你更常因为什么而改变对一件事的看法？", options: [{ label: "看到更真实具体的例子", value: "S" }, { label: "想到一种全新的可能", value: "N" }, { label: "被人用逻辑说服", value: "T" }, { label: "被某件事触动内心", value: "F" }] },
+    { text: "你更愿意在什么状态下工作？", options: [{ label: "安静无打扰时", value: "I" }, { label: "有人一起讨论时", value: "E" }, { label: "有明确截止时间时", value: "J" }, { label: "灵感涌现时", value: "P" }] },
+    { text: "你更常因为什么而和某人成为朋友？", options: [{ label: "经常一起玩", value: "E" }, { label: "聊得来、懂彼此", value: "F" }, { label: "有共同目标", value: "J" }, { label: "能互相激发想法", value: "N" }] },
+    { text: "你更愿意怎么面对压力？", options: [{ label: "分解目标逐个击破", value: "J" }, { label: "先做点别的缓和一下", value: "P" }, { label: "找人聊聊释放情绪", value: "F" }, { label: "分析压力来源再处理", value: "T" }] },
+    { text: "你更常记住一段经历的：", options: [{ label: "具体细节和场景", value: "S" }, { label: "整体感受和意义", value: "N" }, { label: "别人怎么对你", value: "F" }, { label: "事情对错的判断", value: "T" }] },
+    { text: "你更愿意在一场讨论中：", options: [{ label: "提出创新观点", value: "N" }, { label: "梳理逻辑结构", value: "T" }, { label: "协调不同意见", value: "F" }, { label: "总结具体结论", value: "S" }] },
+    { text: "你更常因为什么而放弃一件事？", options: [{ label: "看不到实际结果", value: "S" }, { label: "觉得不够有趣了", value: "N" }, { label: "觉得不公平不合理", value: "T" }, { label: "觉得伤害到关系", value: "F" }] },
+    { text: "你更希望别人怎么看你？", options: [{ label: "热情、有活力", value: "E" }, { label: "深沉、有想法", value: "I" }, { label: "靠谱、有原则", value: "T" }, { label: "温暖、能依靠", value: "F" }] },
+    { text: "你更愿意用哪种方式度过一个下午？", options: [{ label: "约人喝茶聊天", value: "E" }, { label: "一个人看书写作", value: "I" }, { label: "研究一个具体问题", value: "T" }, { label: "随便走走感受生活", value: "P" }] },
+    { text: "你更常因为什么而感到充实？", options: [{ label: "完成了计划中的任务", value: "J" }, { label: "体验了新鲜的事物", value: "N" }, { label: "和喜欢的人相处", value: "F" }, { label: "享受了当下的安稳", value: "S" }] },
+    { text: "你更看重一个人说话时的：", options: [{ label: "事实是否准确", value: "S" }, { label: "有没有独到洞见", value: "N" }, { label: "逻辑是否严密", value: "T" }, { label: "是否真诚体贴", value: "F" }] },
+    { text: "你更愿意在什么情况下妥协？", options: [{ label: "为了推进事情", value: "J" }, { label: "为了保持关系", value: "F" }, { label: "为了换来新的可能", value: "N" }, { label: "为了省事不折腾", value: "S" }] },
+    { text: "你更常怎么看待“规则”？", options: [{ label: "是保障秩序的必要手段", value: "J" }, { label: "是限制自由的东西", value: "P" }, { label: "是公平的体现", value: "T" }, { label: "是照顾弱者的工具", value: "F" }] },
+    { text: "你更愿意在什么状态下做重要决定？", options: [{ label: "信息充足时", value: "S" }, { label: "内心有感觉时", value: "N" }, { label: "利弊分析清楚后", value: "T" }, { label: "和信任的人商量后", value: "F" }] },
+    { text: "你更常因为什么而欣赏一个人？", options: [{ label: "做事靠谱有始有终", value: "J" }, { label: "有想象力有创意", value: "N" }, { label: "逻辑清晰有主见", value: "T" }, { label: "待人真诚有温度", value: "F" }] },
+    { text: "你更愿意用什么方式记录一次旅行？", options: [{ label: "拍照写明信片", value: "S" }, { label: "写随笔记录感受", value: "N" }, { label: "和朋友随时分享", value: "E" }, { label: "整理成完整游记", value: "J" }] },
+    { text: "你更常因为什么而改变自己的习惯？", options: [{ label: "发现更高效的方法", value: "T" }, { label: "意识到对他人的影响", value: "F" }, { label: "看到实际效果不好", value: "S" }, { label: "想到全新的可能性", value: "N" }] },
+    { text: "你更喜欢的沟通方式是：", options: [{ label: "面对面直接说", value: "E" }, { label: "用文字慢慢写", value: "I" }, { label: "先讲事实再讲观点", value: "S" }, { label: "先讲感受再讲道理", value: "F" }] },
+    { text: "你更愿意如何度过困难时期？", options: [{ label: "一个人扛过去", value: "I" }, { label: "找人陪着一起扛", value: "E" }, { label: "想清问题根源再解决", value: "T" }, { label: "相信一切会好起来", value: "N" }] },
+    { text: "你更常因为什么而感到不满？", options: [{ label: "事情没有按计划进行", value: "J" }, { label: "有人受到了不公平对待", value: "F" }, { label: "讨论没有逻辑", value: "T" }, { label: "环境一成不变", value: "N" }] },
+    { text: "你更愿意在什么情况下做出重要承诺？", options: [{ label: "有把握做到时", value: "S" }, { label: "内心真正认可时", value: "F" }, { label: "逻辑上没问题时", value: "T" }, { label: "觉得有意义时", value: "N" }] },
+    { text: "你更常被什么类型的人吸引？", options: [{ label: "阳光热情的人", value: "E" }, { label: "深沉内敛的人", value: "I" }, { label: "务实可靠的人", value: "S" }, { label: "有思想有创意的人", value: "N" }] },
+    { text: "你更希望在团队中被看作：", options: [{ label: "带动气氛的人", value: "E" }, { label: "独立思考的人", value: "I" }, { label: "推动进度的人", value: "J" }, { label: "协调关系的人", value: "F" }] },
+    { text: "你更常因为什么而主动走出舒适区？", options: [{ label: "看到了实际好处", value: "S" }, { label: "对未知充满好奇", value: "N" }, { label: "想证明自己的判断", value: "T" }, { label: "为了在意的人", value: "F" }] },
+    { text: "你更愿意怎样面对他人的情绪？", options: [{ label: "先共情安抚", value: "F" }, { label: "先帮忙分析", value: "T" }, { label: "给出实际帮助", value: "S" }, { label: "引导他看到新可能", value: "N" }] },
+    { text: "你更常因为什么而觉得某件事值得？", options: [{ label: "带来了具体成果", value: "S" }, { label: "打开了新的视野", value: "N" }, { label: "帮助了别人", value: "F" }, { label: "完成了既定目标", value: "J" }] },
+    { text: "你更愿意在什么样的人际关系中？", options: [{ label: "热闹、常聚", value: "E" }, { label: "安静、少而深", value: "I" }, { label: "有明确边界", value: "T" }, { label: "充满理解与包容", value: "F" }] },
+    { text: "你更常因为什么而做出让步？", options: [{ label: "怕影响关系", value: "F" }, { label: "觉得争下去没意义", value: "P" }, { label: "对方说得有道理", value: "T" }, { label: "想让事情顺利推进", value: "J" }] },
+    { text: "你更希望自己拥有哪种能力？", options: [{ label: "把事做扎实的能力", value: "S" }, { label: "看见未来的洞察力", value: "N" }, { label: "看穿本质的判断力", value: "T" }, { label: "理解他人的共情力", value: "F" }] },
+    { text: "你更常怎么看待“成功”？", options: [{ label: "达成具体目标", value: "J" }, { label: "不断突破自我", value: "N" }, { label: "被人认可和信任", value: "F" }, { label: "生活稳定踏实", value: "S" }] },
+    { text: "你更愿意用什么方式应对孤独？", options: [{ label: "找人陪，热闹起来", value: "E" }, { label: "享受一个人的安静", value: "I" }, { label: "沉浸在思考里", value: "T" }, { label: "去感受生活的细节", value: "S" }] },
+    { text: "你更常因为什么而对未来感到期待？", options: [{ label: "有具体的目标要实现", value: "J" }, { label: "有无限的可能在展开", value: "N" }, { label: "有想陪伴的人在身边", value: "F" }, { label: "日子会越来越稳", value: "S" }] },
+    { text: "你更愿意如何面对自己的缺点？", options: [{ label: "分析原因再改进", value: "T" }, { label: "接纳它并与它共处", value: "F" }, { label: "想办法绕开它", value: "P" }, { label: "相信它会慢慢改变", value: "N" }] },
+    { text: "你更常因为什么而愿意帮助别人？", options: [{ label: "对方确实需要", value: "S" }, { label: "觉得这是应该的", value: "T" }, { label: "看不得别人难受", value: "F" }, { label: "能从中收获新东西", value: "N" }] },
+    { text: "你更愿意在什么样的环境里放松？", options: [{ label: "热闹的人群", value: "E" }, { label: "安静的独处", value: "I" }, { label: "有明确规则的空间", value: "J" }, { label: "自由随性的空间", value: "P" }] },
+    { text: "你更常怎么看待“错误”？", options: [{ label: "是学习的机会", value: "N" }, { label: "说明方法有问题", value: "T" }, { label: "需要认真复盘", value: "J" }, { label: "尽量少犯就行", value: "S" }] },
+    { text: "你更愿意如何度过一段空闲时间？", options: [{ label: "约人出去玩", value: "E" }, { label: "一个人看书", value: "I" }, { label: "研究感兴趣的事", value: "N" }, { label: "把待办清一清", value: "J" }] },
+    { text: "你更常因为什么而愿意尝试新事物？", options: [{ label: "看到别人做成功了", value: "S" }, { label: "觉得它很有意义", value: "F" }, { label: "觉得它很有趣", value: "N" }, { label: "觉得它合乎逻辑", value: "T" }] },
+    { text: "你更希望自己在别人心中是：", options: [{ label: "有趣的人", value: "N" }, { label: "靠谱的人", value: "S" }, { label: "有原则的人", value: "T" }, { label: "温暖的人", value: "F" }] },
+    { text: "你更愿意在什么状态下与他人合作？", options: [{ label: "分工明确时", value: "J" }, { label: "自由发挥时", value: "P" }, { label: "目标一致时", value: "T" }, { label: "彼此信任时", value: "F" }] },
+    { text: "你更常因为什么而改变对某件事的态度？", options: [{ label: "看到新的事实", value: "S" }, { label: "想到新的可能", value: "N" }, { label: "被逻辑说服", value: "T" }, { label: "被打动内心", value: "F" }] },
+    { text: "你更愿意如何面对一段关系的结束？", options: [{ label: "理性接受、向前看", value: "T" }, { label: "需要时间难过一阵", value: "F" }, { label: "继续忙自己的事", value: "P" }, { label: "复盘问题出在哪里", value: "J" }] },
+    { text: "你更常因为什么而感到幸福？", options: [{ label: "生活安稳有序", value: "J" }, { label: "发现新的可能", value: "N" }, { label: "与人真心相处", value: "F" }, { label: "享受当下的美好", value: "S" }] },
+    { text: "你更愿意在什么样的情况下表达自己？", options: [{ label: "有人愿意听时", value: "E" }, { label: "自己真的想清楚后", value: "I" }, { label: "觉得有必要说清楚时", value: "T" }, { label: "觉得能帮到别人时", value: "F" }] },
+    { text: "你更常因为什么而愿意坚持长期做一件事？", options: [{ label: "看到了实际回报", value: "S" }, { label: "相信它有意义", value: "F" }, { label: "觉得它有趣", value: "N" }, { label: "已经形成习惯", value: "J" }] },
+    { text: "你更愿意如何对待别人的不同意见？", options: [{ label: "认真分析是否有理", value: "T" }, { label: "先尊重再考虑", value: "F" }, { label: "听听有没有新启发", value: "N" }, { label: "参考过往类似经验", value: "S" }] },
+    { text: "你更常因为什么而选择沉默？", options: [{ label: "不想引起冲突", value: "F" }, { label: "觉得没必要说", value: "I" }, { label: "还没想清楚", value: "T" }, { label: "觉得说了也没用", value: "P" }] },
+    { text: "你更愿意在什么状态下面对挑战？", options: [{ label: "有清晰计划时", value: "J" }, { label: "有信任的伙伴时", value: "F" }, { label: "能看到新的可能时", value: "N" }, { label: "觉得有把握时", value: "S" }] },
+    { text: "你更常因为什么而愿意承担责任？", options: [{ label: "这是应该做的", value: "T" }, { label: "不想让别人失望", value: "F" }, { label: "想推进事情进展", value: "J" }, { label: "相信自己能做好", value: "S" }] },
+    { text: "你更愿意如何看待自己的过去？", options: [{ label: "那是经验的积累", value: "S" }, { label: "那是成长的过程", value: "N" }, { label: "有遗憾也有收获", value: "F" }, { label: "需要理性复盘", value: "T" }] },
+    { text: "你更常因为什么而对一个人产生信任？", options: [{ label: "他做事靠谱", value: "S" }, { label: "他真诚待人", value: "F" }, { label: "他逻辑清晰", value: "T" }, { label: "他言行一致", value: "J" }] },
+    { text: "你更愿意如何规划未来？", options: [{ label: "制定清晰的长远计划", value: "J" }, { label: "保持开放、随遇而安", value: "P" }, { label: "依据现实逐步推进", value: "S" }, { label: "大胆设想、灵活调整", value: "N" }] },
+    { text: "你更常因为什么而感到平静？", options: [{ label: "生活井然有序", value: "J" }, { label: "内心想通了一件事", value: "N" }, { label: "和信任的人在一起", value: "F" }, { label: "享受简单的小事", value: "S" }] },
+    { text: "你更愿意在什么样的状态下面对批评？", options: [{ label: "对方讲得有道理时", value: "T" }, { label: "对方态度真诚时", value: "F" }, { label: "对方给出具体例子时", value: "S" }, { label: "对方能看到更大可能时", value: "N" }] },
+    { text: "你更常因为什么而改变自己的生活节奏？", options: [{ label: "身体或状态需要", value: "S" }, { label: "有了新的目标", value: "J" }, { label: "想尝试新的可能", value: "N" }, { label: "在意的人需要", value: "F" }] },
+    { text: "你更愿意如何看待自己的情绪？", options: [{ label: "它是真实的信号", value: "F" }, { label: "需要冷静分析", value: "T" }, { label: "来了又走，不必太在意", value: "P" }, { label: "它反映内心的需要", value: "N" }] },
+    { text: "你更常因为什么而愿意走出熟悉的环境？", options: [{ label: "看到了明确的机会", value: "S" }, { label: "好奇外面有什么", value: "N" }, { label: "想证明自己", value: "T" }, { label: "想照顾重要的人", value: "F" }] },
+    { text: "你更愿意在什么样的关系中感到安全？", options: [{ label: "有明确规则和边界", value: "T" }, { label: "彼此真诚、互相理解", value: "F" }, { label: "稳定、少变动", value: "S" }, { label: "彼此尊重成长空间", value: "N" }] },
+    { text: "你更常因为什么而愿意主动联系一个人？", options: [{ label: "想热闹热闹", value: "E" }, { label: "想聊聊最近的想法", value: "N" }, { label: "关心他的近况", value: "F" }, { label: "有事需要沟通", value: "T" }] },
+    { text: "你更愿意如何对待时间？", options: [{ label: "安排清楚、不浪费", value: "J" }, { label: "灵活安排、顺其自然", value: "P" }, { label: "花在值得的事上", value: "T" }, { label: "花在重要的人身上", value: "F" }] },
+    { text: "你更常因为什么而感到有力量？", options: [{ label: "完成了目标", value: "J" }, { label: "想到新的可能", value: "N" }, { label: "被人信任依靠", value: "F" }, { label: "生活安稳踏实", value: "S" }] },
+    { text: "你更愿意在什么样的状态下做出改变？", options: [{ label: "看到现实问题", value: "S" }, { label: "内心真正渴望", value: "F" }, { label: "逻辑上必须如此", value: "T" }, { label: "看到新的可能", value: "N" }] },
+    { text: "你更常因为什么而愿意放下执念？", options: [{ label: "想通了其中的道理", value: "T" }, { label: "不想再为难自己", value: "F" }, { label: "觉得可以顺其自然", value: "P" }, { label: "看到了新的方向", value: "N" }] },
+    { text: "你更愿意如何看待他人的不同？", options: [{ label: "各有各的活法", value: "F" }, { label: "不同才有启发", value: "N" }, { label: "只要讲道理就行", value: "T" }, { label: "习惯就好", value: "S" }] },
+    { text: "你更常因为什么而愿意主动表达关心？", options: [{ label: "对方确实需要", value: "S" }, { label: "内心被触动", value: "F" }, { label: "觉得应该如此", value: "T" }, { label: "想给对方力量", value: "N" }] },
+    { text: "你更愿意如何理解“成长”？", options: [{ label: "把事做得更好", value: "S" }, { label: "看到更大的世界", value: "N" }, { label: "变得更理性清醒", value: "T" }, { label: "变得更懂人心", value: "F" }] },
+    { text: "你更常因为什么而感到满足？", options: [{ label: "计划如预期完成", value: "J" }, { label: "体验了新鲜事物", value: "N" }, { label: "被人真心需要", value: "F" }, { label: "享受了当下安稳", value: "S" }] },
+    { text: "你更愿意如何面对一个未知的领域？", options: [{ label: "先看看现有资料", value: "S" }, { label: "大胆猜想它的可能", value: "N" }, { label: "分析它的结构与逻辑", value: "T" }, { label: "找人一起探索", value: "E" }] },
+    { text: "你更常因为什么而愿意听别人说完？", options: [{ label: "他说的有具体内容", value: "S" }, { label: "他看起来很真诚", value: "F" }, { label: "想弄清他的逻辑", value: "T" }, { label: "想看看有没有新视角", value: "N" }] },
+    { text: "你更愿意如何看待“失败的关系”？", options: [{ label: "是经验积累", value: "S" }, { label: "是成长的一部分", value: "N" }, { label: "说明彼此不合适", value: "T" }, { label: "那是真实的付出", value: "F" }] },
+    { text: "你更常因为什么而感到踏实？", options: [{ label: "一切按计划进行", value: "J" }, { label: "身边有信任的人", value: "F" }, { label: "生活稳定、少变动", value: "S" }, { label: "心里有清晰的方向", value: "N" }] },
+    { text: "你更愿意如何对待自己的欲望？", options: [{ label: "理性审视", value: "T" }, { label: "坦然接纳", value: "F" }, { label: "看是否现实可行", value: "S" }, { label: "看是否能带来新可能", value: "N" }] },
+    { text: "你更常因为什么而愿意分享自己的感受？", options: [{ label: "对方值得信任", value: "F" }, { label: "觉得说出来能理清思路", value: "T" }, { label: "希望被理解", value: "E" }, { label: "觉得这是一种释放", value: "N" }] },
+    { text: "你更愿意如何面对一个两难的选择？", options: [{ label: "分析利弊选最优", value: "T" }, { label: "听从内心更想要的", value: "F" }, { label: "看现实条件允许什么", value: "S" }, { label: "想想哪个有更多可能", value: "N" }] },
+    { text: "你更常因为什么而愿意持续努力？", options: [{ label: "能看到进步", value: "S" }, { label: "相信未来会更好", value: "N" }, { label: "不想让人失望", value: "F" }, { label: "已经定下目标", value: "J" }] },
+    { text: "你更愿意如何看待自己的局限？", options: [{ label: "那是努力的方向", value: "J" }, { label: "那是成长的空间", value: "N" }, { label: "坦然接受它的存在", value: "P" }, { label: "没关系，慢慢来", value: "F" }] },
+    { text: "你更常因为什么而愿意原谅一个人？", options: [{ label: "他确实有难处", value: "F" }, { label: "这件事不值得计较", value: "P" }, { label: "他讲清了道理", value: "T" }, { label: "相信他以后会变", value: "N" }] },
+    { text: "你更愿意如何对待自己的爱好？", options: [{ label: "把它做到专业", value: "S" }, { label: "不断尝试新的", value: "N" }, { label: "当放松和享受", value: "P" }, { label: "和他人一起玩", value: "E" }] },
+    { text: "你更常因为什么而愿意认真倾听？", options: [{ label: "对方说的有具体内容", value: "S" }, { label: "对方情绪需要被接住", value: "F" }, { label: "想弄清事情的来龙去脉", value: "T" }, { label: "想从中学到新东西", value: "N" }] },
+    { text: "你更愿意在什么样的状态下做自己？", options: [{ label: "独处的时候", value: "I" }, { label: "在信任的人面前", value: "F" }, { label: "没人管束的时候", value: "P" }, { label: "有人欣赏的时候", value: "E" }] },
+    { text: "你更常因为什么而改变一个习惯？", options: [{ label: "看到了具体效果", value: "S" }, { label: "觉得这样更合理", value: "T" }, { label: "在意的人提出建议", value: "F" }, { label: "想到了更好的方式", value: "N" }] },
+    { text: "你更愿意如何面对一个你不擅长的事？", options: [{ label: "硬着头皮做", value: "J" }, { label: "找人帮忙", value: "E" }, { label: "想办法绕开", value: "P" }, { label: "先分析它值不值得做", value: "T" }] },
+    { text: "你更常因为什么而对生活充满期待？", options: [{ label: "有明确计划要实现", value: "J" }, { label: "有新鲜事会发生", value: "N" }, { label: "有喜欢的人在身边", value: "F" }, { label: "生活安稳就很满足", value: "S" }] },
+    { text: "你更愿意如何看待一段沉默？", options: [{ label: "安静也是一种陪伴", value: "I" }, { label: "沉默让我不安", value: "E" }, { label: "不说话可能有问题", value: "T" }, { label: "沉默里也有情绪", value: "F" }] },
+    { text: "你更常因为什么而感到温暖？", options: [{ label: "有人记得你的喜好", value: "S" }, { label: "有人理解你的想法", value: "N" }, { label: "有人在你需要时出现", value: "F" }, { label: "事情顺利推进", value: "J" }] },
+    { text: "你更愿意如何对待一次误解？", options: [{ label: "立刻解释清楚", value: "E" }, { label: "找合适时机说明", value: "F" }, { label: "用事实来证明", value: "T" }, { label: "相信时间会解释", value: "I" }] },
+    { text: "你更常因为什么而愿意主动承担风险？", options: [{ label: "算清楚了胜算", value: "T" }, { label: "想试试会怎样", value: "N" }, { label: "有信任的人在身边", value: "F" }, { label: "已经做好了准备", value: "J" }] },
+    { text: "你更愿意如何在一个人面前放松？", options: [{ label: "聊得来、能开玩笑", value: "E" }, { label: "不用说话也不尴尬", value: "I" }, { label: "彼此真诚、有信任", value: "F" }, { label: "有共同的兴趣话题", value: "N" }] },
+    { text: "你更常因为什么而感到有归属感？", options: [{ label: "有一群固定的朋友", value: "E" }, { label: "有可以独处的空间", value: "I" }, { label: "有明确的生活秩序", value: "J" }, { label: "有理解自己的人", value: "F" }] },
+    { text: "你更愿意如何看待一次失败的选择？", options: [{ label: "承认判断有误", value: "T" }, { label: "从中看到新方向", value: "N" }, { label: "那是努力的证明", value: "F" }, { label: "下次选得更稳妥", value: "S" }] },
+    { text: "你更常因为什么而愿意原谅自己？", options: [{ label: "告诉自己人都会犯错", value: "F" }, { label: "分析清楚原因", value: "T" }, { label: "觉得过去了就算了", value: "P" }, { label: "相信下次会更好", value: "N" }] },
+    { text: "你更愿意如何对待他人的期待？", options: [{ label: "尽量不让人失望", value: "F" }, { label: "看是否合理", value: "T" }, { label: "按自己的节奏来", value: "P" }, { label: "当作努力的方向", value: "J" }] },
+    { text: "你更常因为什么而愿意保持耐心？", options: [{ label: "相信会有结果", value: "N" }, { label: "这是必须的过程", value: "S" }, { label: "不想把关系搞僵", value: "F" }, { label: "目标还没完成", value: "J" }] },
+    { text: "你更愿意如何看待身边人的不同选择？", options: [{ label: "尊重每个人", value: "F" }, { label: "不同才有意思", value: "N" }, { label: "看是否讲得通", value: "T" }, { label: "各有各的考虑", value: "S" }] },
+    { text: "你更常因为什么而愿意放下手机？", options: [{ label: "手头有具体的事", value: "S" }, { label: "身边有重要的人", value: "F" }, { label: "想安静思考", value: "I" }, { label: "有新的目标要推进", value: "J" }] },
+    { text: "你更愿意如何对待一段无疾而终的关系？", options: [{ label: "接受并继续生活", value: "P" }, { label: "回忆那些温暖的时刻", value: "F" }, { label: "想清楚问题出在哪", value: "T" }, { label: "相信会有更好的遇见", value: "N" }] },
+    { text: "你更常因为什么而愿意分享自己的资源？", options: [{ label: "对方真的需要", value: "F" }, { label: "觉得这很合理", value: "T" }, { label: "这样做有实际价值", value: "S" }, { label: "相信会带来好的回响", value: "N" }] },
+    { text: "你更愿意如何面对生活中的不确定？", options: [{ label: "尽量做好计划", value: "J" }, { label: "顺其自然，不焦虑", value: "P" }, { label: "相信事情会变好", value: "N" }, { label: "先看最坏的情况", value: "T" }] },
+    { text: "你更常因为什么而感到被理解？", options: [{ label: "对方记得你说过的细节", value: "S" }, { label: "对方懂你的言外之意", value: "N" }, { label: "对方不评判你的感受", value: "F" }, { label: "对方认同你的逻辑", value: "T" }] },
+    { text: "你更愿意如何对待自己的情绪低谷？", options: [{ label: "给自己时间慢慢缓", value: "F" }, { label: "分析它从哪来", value: "T" }, { label: "做点别的转移注意力", value: "P" }, { label: "找朋友聊一聊", value: "E" }] },
+    { text: "你更常因为什么而愿意为一个人付出？", options: [{ label: "他值得我这样做", value: "F" }, { label: "这符合我的原则", value: "T" }, { label: "有来有往很公平", value: "J" }, { label: "喜欢就不计较", value: "N" }] },
+    { text: "你更愿意如何面对一次错误的判断？", options: [{ label: "复盘整个过程", value: "J" }, { label: "分析逻辑漏洞", value: "T" }, { label: "接受自己会犯错", value: "F" }, { label: "当经验积累下来", value: "S" }] },
+    { text: "你更常因为什么而感到生活有意义？", options: [{ label: "目标在逐步实现", value: "J" }, { label: "内心有热爱的事", value: "N" }, { label: "和重要的人在一起", value: "F" }, { label: "每天踏实安稳", value: "S" }] },
+    { text: "你更愿意如何对待一个你不认同的人？", options: [{ label: "保持基本尊重", value: "F" }, { label: "只看事实和逻辑", value: "T" }, { label: "尽量少接触", value: "I" }, { label: "试着找到共性", value: "N" }] },
+    { text: "你更常因为什么而愿意改变方向？", options: [{ label: "现实条件不允许", value: "S" }, { label: "发现了更好的可能", value: "N" }, { label: "原本的方案有问题", value: "T" }, { label: "在意的人需要", value: "F" }] },
+    { text: "你更愿意如何看待自己的天赋？", options: [{ label: "要好好利用它", value: "J" }, { label: "让它自由生长", value: "P" }, { label: "用它帮助别人", value: "F" }, { label: "不断打磨它", value: "S" }] },
+    { text: "你更常因为什么而愿意拒绝一件事？", options: [{ label: "它不符合我的原则", value: "T" }, { label: "它让我心里不舒服", value: "F" }, { label: "它打乱了我的计划", value: "J" }, { label: "它没什么实际意义", value: "S" }] },
+    { text: "你更愿意如何对待别人的建议？", options: [{ label: "有道理就采纳", value: "T" }, { label: "先感受他的用心", value: "F" }, { label: "看是否有实际帮助", value: "S" }, { label: "想想有没有新启发", value: "N" }] },
+    { text: "你更常因为什么而愿意回头看看？", options: [{ label: "想复盘经验", value: "J" }, { label: "想记住那些美好", value: "F" }, { label: "想弄清事情脉络", value: "T" }, { label: "想从中得到启示", value: "N" }] },
+    { text: "你更愿意如何对待一个重要的决定？", options: [{ label: "列出利弊分析", value: "T" }, { label: "听从内心感受", value: "F" }, { label: "参考过往经验", value: "S" }, { label: "想象不同的未来", value: "N" }] },
+    { text: "你更常因为什么而愿意展现真实的自己？", options: [{ label: "对方值得信任", value: "F" }, { label: "没什么好隐藏的", value: "S" }, { label: "觉得这样很自在", value: "P" }, { label: "想被人真正看见", value: "E" }] },
+    { text: "你更愿意如何看待一次意外之喜？", options: [{ label: "生活的小确幸", value: "S" }, { label: "努力的回馈", value: "J" }, { label: "宇宙的温柔", value: "N" }, { label: "值得分享给谁", value: "F" }] },
+    { text: "你更常因为什么而愿意静下心来？", options: [{ label: "需要理清思路", value: "T" }, { label: "需要安抚情绪", value: "F" }, { label: "需要完成计划", value: "J" }, { label: "需要感受当下", value: "S" }] },
+    { text: "你更愿意如何对待那些不理解你的人？", options: [{ label: "不必强求", value: "P" }, { label: "试着解释一次", value: "F" }, { label: "用事实去证明", value: "T" }, { label: "相信时间会说明", value: "N" }] },
+    { text: "你更常因为什么而愿意开始一件事？", options: [{ label: "有清晰的步骤", value: "J" }, { label: "觉得它有趣", value: "N" }, { label: "有人一起做", value: "E" }, { label: "觉得它能带来价值", value: "S" }] },
+    { text: "你更愿意如何对待一次失望？", options: [{ label: "接受现实", value: "S" }, { label: "消化一阵情绪", value: "F" }, { label: "分析失望的原因", value: "T" }, { label: "相信还有别的可能", value: "N" }] },
+    { text: "你更常因为什么而感到被爱？", options: [{ label: "有人为我做具体的事", value: "S" }, { label: "有人懂我的沉默", value: "I" }, { label: "有人愿意陪我", value: "E" }, { label: "有人无条件接纳我", value: "F" }] },
+    { text: "你更愿意如何面对生活中琐碎的事？", options: [{ label: "列清单逐一处理", value: "J" }, { label: "能做就做，不纠结", value: "P" }, { label: "想想哪些真的重要", value: "T" }, { label: "和喜欢的人一起做", value: "F" }] },
+    { text: "你更常因为什么而愿意信任一个人？", options: [{ label: "他从不食言", value: "J" }, { label: "他懂你", value: "F" }, { label: "他做事讲逻辑", value: "T" }, { label: "他见过你的全部", value: "N" }] },
+    { text: "你更愿意如何对待自己的失误？", options: [{ label: "认真复盘改进", value: "J" }, { label: "接纳并放下", value: "F" }, { label: "分析原因教训", value: "T" }, { label: "当作成长的一部分", value: "N" }] },
+    { text: "你更常因为什么而感到有动力？", options: [{ label: "看到具体进展", value: "S" }, { label: "想到未来的可能", value: "N" }, { label: "被人真诚鼓励", value: "F" }, { label: "有清晰的目标", value: "J" }] },
+    { text: "你更愿意如何对待一段新的关系？", options: [{ label: "慢慢观察", value: "I" }, { label: "主动热情一些", value: "E" }, { label: "先看是否合得来", value: "F" }, { label: "先看是否讲得通", value: "T" }] },
+    { text: "你更常因为什么而愿意放下评判？", options: [{ label: "理解了他的处境", value: "F" }, { label: "想通了其中道理", value: "T" }, { label: "觉得无所谓了", value: "P" }, { label: "看到了更大的格局", value: "N" }] },
+    { text: "你更愿意如何度过一段难熬的日子？", options: [{ label: "按计划撑过去", value: "J" }, { label: "找人陪着一起扛", value: "E" }, { label: "相信总会好起来", value: "N" }, { label: "把注意力放在当下", value: "S" }] },
+    { text: "你更常因为什么而愿意开口求助？", options: [{ label: "真的需要帮助", value: "S" }, { label: "对方值得信任", value: "F" }, { label: "自己解决不了", value: "T" }, { label: "想听不同视角", value: "N" }] },
+    { text: "你更愿意如何对待自己内心的冲突？", options: [{ label: "分析根源", value: "T" }, { label: "先接纳情绪", value: "F" }, { label: "放一放再说", value: "P" }, { label: "想象解决后的样子", value: "N" }] },
+    { text: "你更常因为什么而感到人间值得？", options: [{ label: "日常的小美好", value: "S" }, { label: "有热爱的事", value: "N" }, { label: "身边有爱的人", value: "F" }, { label: "生活有秩序感", value: "J" }] },
+    { text: "你更愿意在什么状态下面对一次机会？", options: [{ label: "有充分准备时", value: "J" }, { label: "有靠谱伙伴时", value: "F" }, { label: "看到明确回报时", value: "S" }, { label: "感到兴奋好奇时", value: "N" }] },
+    { text: "你更常因为什么而愿意给别人第二次机会？", options: [{ label: "他态度足够真诚", value: "F" }, { label: "他说明了具体原因", value: "T" }, { label: "他这次有实际改变", value: "S" }, { label: "相信人都会成长", value: "N" }] },
+    { text: "你更愿意如何处理一次意见不合？", options: [{ label: "先听完再说", value: "I" }, { label: "当场把观点摆开", value: "E" }, { label: "先看事实和逻辑", value: "T" }, { label: "先顾大家情绪", value: "F" }] },
+    { text: "你更常因为什么而愿意投入一段长期关系？", options: [{ label: "彼此目标一致", value: "J" }, { label: "对方值得信任", value: "F" }, { label: "有现实的默契", value: "S" }, { label: "有成长的空间", value: "N" }] },
+    { text: "你更愿意如何回应别人对你的期待？", options: [{ label: "尽量做到", value: "J" }, { label: "先看是否合理", value: "T" }, { label: "不想让人失望", value: "F" }, { label: "按自己节奏来", value: "P" }] },
+    { text: "你更常因为什么而感到被看见？", options: [{ label: "有人记得你的付出", value: "F" }, { label: "有人认同你的判断", value: "T" }, { label: "有人注意到你的细节", value: "S" }, { label: "有人读懂了你的想法", value: "N" }] },
+    { text: "你更愿意如何度过一次独处的周末？", options: [{ label: "安排一件想做的事", value: "J" }, { label: "随意放松、走到哪算哪", value: "P" }, { label: "出门走走感受世界", value: "E" }, { label: "整理思绪、沉淀自己", value: "I" }] },
+    { text: "你更常因为什么而愿意原谅一段旧关系？", options: [{ label: "想通了当时的事", value: "T" }, { label: "放下了心里的怨", value: "F" }, { label: "觉得时间已经足够", value: "P" }, { label: "看见彼此都变过", value: "N" }] },
+    { text: "你更愿意如何应对一场没有准备的谈话？", options: [{ label: "先听对方说", value: "I" }, { label: "顺着聊下去", value: "E" }, { label: "先抓住核心问题", value: "T" }, { label: "先感受气氛再开口", value: "F" }] },
+    { text: "你更常因为什么而愿意做一件没有回报的事？", options: [{ label: "它让我心安", value: "F" }, { label: "它有意义", value: "N" }, { label: "它是应该做的", value: "T" }, { label: "顺手就做了", value: "S" }] },
+    { text: "你更愿意如何面对一个反复让你失望的人？", options: [{ label: "再给一次机会", value: "F" }, { label: "划清界限", value: "T" }, { label: "慢慢淡出", value: "I" }, { label: "先看是否有变", value: "N" }] },
+    { text: "你更常因为什么而愿意做一次冒险的决定？", options: [{ label: "对结果有把握", value: "T" }, { label: "内心强烈想试", value: "F" }, { label: "看得到可行路径", value: "S" }, { label: "被可能性吸引", value: "N" }] },
+    { text: "你更愿意如何对待自己的某段黑历史？", options: [{ label: "复盘然后放下", value: "T" }, { label: "允许自己难过", value: "F" }, { label: "当作成长必经", value: "N" }, { label: "尽量不再提起", value: "I" }] },
+    { text: "你更常因为什么而愿意说一句“谢谢”？", options: [{ label: "对方确实帮到了我", value: "S" }, { label: "对方心意很真诚", value: "F" }, { label: "这是基本礼貌", value: "T" }, { label: "想让对方舒服点", value: "E" }] },
+    { text: "你更愿意如何在一次旅行中安排时间？", options: [{ label: "提前定好节奏", value: "J" }, { label: "现场随机调整", value: "P" }, { label: "尽量多体验", value: "E" }, { label: "留足独处时间", value: "I" }] },
+    { text: "你更常因为什么而愿意听一个不熟悉的人讲故事？", options: [{ label: "他讲得具体生动", value: "S" }, { label: "他讲得有思想", value: "N" }, { label: "他讲得真实动人", value: "F" }, { label: "他讲得有条有理", value: "T" }] },
+    { text: "你更愿意如何对待一段需要慢慢培养的信任？", options: [{ label: "用时间验证", value: "S" }, { label: "用心去感受", value: "F" }, { label: "用事实来判断", value: "T" }, { label: "相信会有结果", value: "N" }] },
+    { text: "你更常因为什么而愿意主动道歉？", options: [{ label: "确实是自己错了", value: "T" }, { label: "不想关系变坏", value: "F" }, { label: "想尽快翻篇", value: "P" }, { label: "想给彼此台阶", value: "J" }] },
+    { text: "你更愿意如何面对一次没有达成的目标？", options: [{ label: "复盘找原因", value: "T" }, { label: "难过一阵再继续", value: "F" }, { label: "重新设定新目标", value: "J" }, { label: "相信下次会更好", value: "N" }] },
+    { text: "你更常因为什么而愿意做一次长期承诺？", options: [{ label: "现实条件支持", value: "S" }, { label: "内心真正认同", value: "F" }, { label: "逻辑上想清楚", value: "T" }, { label: "看见未来可能", value: "N" }] },
+    { text: "你更愿意如何对待一次被误解的善意？", options: [{ label: "解释一次就算", value: "T" }, { label: "有点委屈但放下", value: "F" }, { label: "相信时间会澄清", value: "N" }, { label: "下次不再多事", value: "I" }] },
+    { text: "你更常因为什么而愿意在人群中先开口？", options: [{ label: "怕冷场", value: "E" }, { label: "有话想说", value: "T" }, { label: "想让别人舒服", value: "F" }, { label: "看准了时机", value: "S" }] },
+    { text: "你更愿意如何处理一次被打断的计划？", options: [{ label: "立刻补上新方案", value: "J" }, { label: "顺势看看别的可能", value: "P" }, { label: "先找原因", value: "T" }, { label: "先安抚自己情绪", value: "F" }] },
+    { text: "你更常因为什么而愿意留在某个圈子里？", options: [{ label: "大家都很靠谱", value: "J" }, { label: "待着很舒服", value: "F" }, { label: "有实际资源可用", value: "S" }, { label: "能碰撞出新想法", value: "N" }] },
+    { text: "你更愿意如何面对自己的一份不甘心？", options: [{ label: "想办法赢回来", value: "T" }, { label: "承认它，然后放下", value: "F" }, { label: "交给时间消化", value: "P" }, { label: "把它变成新方向", value: "N" }] },
+    { text: "你更常因为什么而愿意和一个人深聊？", options: [{ label: "他让我放松", value: "F" }, { label: "他讲得清楚", value: "T" }, { label: "他有实际经验", value: "S" }, { label: "他总有新视角", value: "N" }] },
+    { text: "你更愿意如何对待一次被拒绝的机会？", options: [{ label: "复盘原因再试", value: "J" }, { label: "难过一阵再放下", value: "F" }, { label: "下次选得更稳", value: "S" }, { label: "相信有更好的安排", value: "N" }] },
+    { text: "你更常因为什么而愿意长时间做一件重复的事？", options: [{ label: "它稳定可靠", value: "S" }, { label: "它有明确目标", value: "J" }, { label: "它让我心安", value: "F" }, { label: "它能引出新东西", value: "N" }] },
+    { text: "你更愿意如何对待一段并不完美的关系？", options: [{ label: "接受它的样子", value: "F" }, { label: "看是否还值得继续", value: "T" }, { label: "尽量经营好它", value: "J" }, { label: "相信还能变得更好", value: "N" }] },
+    { text: "你更常因为什么而愿意在关键时刻站出来？", options: [{ label: "没人做也得有人做", value: "J" }, { label: "看不得局面失控", value: "F" }, { label: "有把握能处理好", value: "T" }, { label: "这是成长的机会", value: "N" }] },
+    { text: "你更愿意如何面对一次被忽略的付出？", options: [{ label: "不再继续付出", value: "T" }, { label: "难受一阵就放下", value: "F" }, { label: "相信对方也许有难处", value: "N" }, { label: "把心力收回自己身上", value: "I" }] },
+    { text: "你更常因为什么而愿意为一个人改变一点自己？", options: [{ label: "他值得我这样", value: "F" }, { label: "这件事确实需要调", value: "T" }, { label: "有利于长期关系", value: "J" }, { label: "看到新的自己", value: "N" }] },
+    { text: "你更愿意如何对待一次意外的失落？", options: [{ label: "给自己时间消化", value: "F" }, { label: "梳理发生了什么", value: "T" }, { label: "继续做该做的事", value: "S" }, { label: "相信它会过去", value: "N" }] },
+    { text: "当你在深夜想起一个久未联系的人，你更常：", options: [{ label: "直接发消息过去", value: "E" }, { label: "翻翻聊天记录就算了", value: "I" }, { label: "想他过得好不好", value: "F" }, { label: "想当初为什么会走散", value: "T" }] },
+    { text: "你更愿意在什么样的时候发朋友圈？", options: [{ label: "开心、有值得分享的事", value: "E" }, { label: "情绪很低落的时候", value: "F" }, { label: "完成了一件重要的事", value: "J" }, { label: "几乎不发，或只发风景", value: "I" }] },
+    { text: "当一个人对你说“我懂你”，你更常：", options: [{ label: "心里一暖，愿意多说一点", value: "F" }, { label: "有点警惕，想他真懂吗", value: "T" }, { label: "笑一笑，不太当真", value: "I" }, { label: "顺势聊下去看看", value: "E" }] },
+    { text: "你更愿意如何面对一个“改不了”的缺点？", options: [{ label: "接受它，和它共处", value: "F" }, { label: "想办法绕开它的影响", value: "T" }, { label: "放着不管，先做别的", value: "P" }, { label: "相信时间会磨掉它", value: "N" }] },
+    { text: "你更常因为什么而觉得一段关系“值了”？", options: [{ label: "一起经历了很多具体的事", value: "S" }, { label: "彼此都变成了更好的人", value: "N" }, { label: "在最难的时候没有走", value: "F" }, { label: "该说清楚的都说清楚了", value: "T" }] },
+    { text: "你更愿意在什么时候选择“不解释”？", options: [{ label: "对方根本不想听", value: "T" }, { label: "解释了会伤到人", value: "F" }, { label: "觉得没必要", value: "I" }, { label: "想看看会怎样", value: "P" }] },
+    { text: "你更常因为什么而愿意重新开始？", options: [{ label: "现实已经不允许继续", value: "S" }, { label: "看见了一个新的方向", value: "N" }, { label: "不想再困在原地", value: "F" }, { label: "想清楚了问题在哪", value: "T" }] },
+    { text: "你更愿意如何对待一个曾经伤害过你的人？", options: [{ label: "保持距离，不再深交", value: "I" }, { label: "表面客气，心里有数", value: "T" }, { label: "如果对方真诚，可以再试", value: "F" }, { label: "相信人会变", value: "N" }] },
+    { text: "你更常因为什么而愿意承认“我不知道”？", options: [{ label: "确实没接触过", value: "S" }, { label: "不想装懂", value: "T" }, { label: "觉得坦诚更好", value: "F" }, { label: "想听别人怎么说", value: "N" }] },
+    { text: "你更愿意在什么样的状态下做出承诺？", options: [{ label: "有把握做到", value: "J" }, { label: "内心真的想", value: "F" }, { label: "想清楚代价", value: "T" }, { label: "感觉对了就答应", value: "P" }] },
+    { text: "你更常因为什么而愿意放下一个人？", options: [{ label: "对方已经不再回应", value: "S" }, { label: "想通了没有未来", value: "N" }, { label: "心已经累了", value: "F" }, { label: "决定不再自欺", value: "T" }] },
+    { text: "你更愿意如何面对一次“来不及”？", options: [{ label: "接受，继续生活", value: "S" }, { label: "想如果当时怎样", value: "N" }, { label: "难过一阵", value: "F" }, { label: "复盘哪里出了问题", value: "T" }] },
+    { text: "你更常因为什么而愿意主动示好？", options: [{ label: "想让气氛缓和", value: "F" }, { label: "觉得这样更高效", value: "T" }, { label: "本来就想联系", value: "E" }, { label: "看对方反应", value: "P" }] },
+    { text: "你更愿意如何对待一段“回不去”的关系？", options: [{ label: "留在记忆里", value: "N" }, { label: "感谢它发生过", value: "F" }, { label: "不再回头看", value: "T" }, { label: "偶尔还会想起", value: "I" }] },
+    { text: "你更常因为什么而愿意在关系里先退一步？", options: [{ label: "不想把话说绝", value: "F" }, { label: "觉得争没意义", value: "P" }, { label: "想把事情推进", value: "J" }, { label: "看清了谁更在意", value: "T" }] },
+    { text: "你更愿意如何看待“孤独”这件事？", options: [{ label: "是常态，习惯就好", value: "I" }, { label: "是提醒，该联系人了", value: "E" }, { label: "是成长的一部分", value: "N" }, { label: "是需要被处理的问题", value: "T" }] },
+    { text: "你更常因为什么而愿意对一个人彻底死心？", options: [{ label: "对方反复越界", value: "T" }, { label: "失望攒够了", value: "F" }, { label: "发现对方从没变过", value: "S" }, { label: "看清了关系的本质", value: "N" }] },
+    { text: "你更愿意如何面对一次“被选择”或“被放弃”？", options: [{ label: "接受结果", value: "S" }, { label: "想清楚为什么", value: "T" }, { label: "允许自己难过", value: "F" }, { label: "相信会有别的路", value: "N" }] },
+    { text: "你更常因为什么而愿意在深夜给别人发消息？", options: [{ label: "真的很想说话", value: "E" }, { label: "情绪撑不住了", value: "F" }, { label: "想到一个必须说清的事", value: "T" }, { label: "觉得对方应该也没睡", value: "N" }] },
+    { text: "你更愿意如何对待自己“不够好”的那一面？", options: [{ label: "慢慢改", value: "J" }, { label: "先接纳", value: "F" }, { label: "分析它从哪来", value: "T" }, { label: "相信它会变", value: "N" }] },
+    { text: "你更常因为什么而愿意放下手机去陪一个人？", options: [{ label: "对方真的需要我", value: "F" }, { label: "这件事很重要", value: "J" }, { label: "本来就想见他", value: "E" }, { label: "觉得该尽到责任", value: "T" }] },
+    { text: "你更愿意如何面对一次“说不出口”的喜欢？", options: [{ label: "先观察再说", value: "I" }, { label: "找机会试探", value: "N" }, { label: "直接表达", value: "E" }, { label: "先想清楚后果", value: "T" }] },
+    { text: "你更常因为什么而愿意在关系里“先低头”？", options: [{ label: "不想失去", value: "F" }, { label: "觉得对错不重要", value: "P" }, { label: "想尽快解决", value: "J" }, { label: "算过成本", value: "T" }] },
+    { text: "你更愿意如何对待一段“没有名分”的亲密？", options: [{ label: "享受当下", value: "P" }, { label: "想要一个答案", value: "J" }, { label: "看对方态度", value: "F" }, { label: "分析有没有未来", value: "N" }] },
+    { text: "你更常因为什么而愿意结束一段消耗你的关系？", options: [{ label: "身体先扛不住了", value: "S" }, { label: "想通了没有意义", value: "N" }, { label: "心彻底凉了", value: "F" }, { label: "算清了不值得", value: "T" }] },
+    { text: "你更愿意如何面对一次“被误会”的沉默？", options: [{ label: "不解释，随他去", value: "I" }, { label: "找机会说清楚", value: "E" }, { label: "用行动证明", value: "S" }, { label: "相信懂的人自然懂", value: "N" }] },
+    { text: "你更常因为什么而愿意在关系里“示弱”？", options: [{ label: "真的撑不住了", value: "F" }, { label: "想让对方靠近", value: "E" }, { label: "觉得这样更有效", value: "T" }, { label: "想让关系缓一缓", value: "P" }] },
+    { text: "你更愿意如何对待一个“聊得来但走不近”的人？", options: [{ label: "保持距离", value: "I" }, { label: "偶尔联系", value: "P" }, { label: "试着再靠近一点", value: "F" }, { label: "看有没有共同目标", value: "J" }] },
+    { text: "你更常因为什么而愿意在关系里“坦白”？", options: [{ label: "不想再演了", value: "F" }, { label: "觉得这样更省事", value: "T" }, { label: "对方值得知道", value: "E" }, { label: "想看看会发生什么", value: "N" }] },
+    { text: "你更愿意如何面对一段“回消息越来越慢”的关系？", options: [{ label: "直接问清楚", value: "E" }, { label: "自己也慢下来", value: "I" }, { label: "先观察一阵", value: "P" }, { label: "想想是不是自己太在意", value: "F" }] },
+    { text: "你更常因为什么而愿意在关系里“先给”？", options: [{ label: "想让对方开心", value: "F" }, { label: "觉得这是投资", value: "T" }, { label: "习惯先付出", value: "S" }, { label: "想看看对方怎么回应", value: "N" }] },
+    { text: "你更愿意如何对待一段“彼此都累了”的关系？", options: [{ label: "先停下来缓一缓", value: "P" }, { label: "把话摊开谈", value: "T" }, { label: "各退一步试试", value: "F" }, { label: "重新定个目标", value: "J" }] },
+    { text: "你更常因为什么而愿意在关系里“不再解释”？", options: [{ label: "对方根本不想懂", value: "T" }, { label: "解释太多次了", value: "F" }, { label: "觉得没必要", value: "I" }, { label: "想让时间说话", value: "N" }] },
+    { text: "你更愿意如何面对一次“被留下”或“被丢下”？", options: [{ label: "接受现实", value: "S" }, { label: "想清楚原因", value: "T" }, { label: "难过但会好", value: "F" }, { label: "相信有新的开始", value: "N" }] },
+    { text: "你更常因为什么而愿意在关系里“先走一步”？", options: [{ label: "看清了没有未来", value: "N" }, { label: "不想再耗下去", value: "F" }, { label: "算清了代价", value: "T" }, { label: "觉得该结束了", value: "J" }] },
+    { text: "你更愿意如何对待一段“还没来得及开始”的关系？", options: [{ label: "放在心里", value: "I" }, { label: "找机会试试", value: "E" }, { label: "想如果当时主动", value: "N" }, { label: "接受错过", value: "S" }] },
+    { text: "你更常因为什么而愿意在关系里“不再期待”？", options: [{ label: "失望太多次", value: "F" }, { label: "看清了对方", value: "T" }, { label: "觉得没必要", value: "I" }, { label: "想放过自己", value: "N" }] },
+    { text: "你更愿意如何面对一次“说不清”的告别？", options: [{ label: "接受它说不清", value: "P" }, { label: "想弄明白", value: "T" }, { label: "允许自己难过", value: "F" }, { label: "相信时间会给答案", value: "N" }] },
+    { text: "你更常因为什么而愿意在关系里“先相信”？", options: [{ label: "对方让我安心", value: "F" }, { label: "没有理由不信", value: "S" }, { label: "觉得值得一试", value: "N" }, { label: "算过风险可控", value: "T" }] },
+    { text: "你更愿意如何对待一段“已经变淡”的友情？", options: [{ label: "顺其自然", value: "P" }, { label: "偶尔主动联系", value: "E" }, { label: "珍惜曾经的回忆", value: "F" }, { label: "想清楚为什么变淡", value: "T" }] },
+    { text: "你更常因为什么而愿意在关系里“先道歉”？", options: [{ label: "不想关系僵着", value: "F" }, { label: "觉得自己也有错", value: "T" }, { label: "想尽快翻篇", value: "P" }, { label: "想给对方台阶", value: "J" }] },
+    { text: "你更愿意如何面对一次“被否定”的努力？", options: [{ label: "继续做下去", value: "J" }, { label: "想想哪里不对", value: "T" }, { label: "难过一阵", value: "F" }, { label: "相信总会有人看见", value: "N" }] },
+    { text: "你更常因为什么而愿意在关系里“先离开”？", options: [{ label: "看清了没有意义", value: "N" }, { label: "心已经凉了", value: "F" }, { label: "算清了不值得", value: "T" }, { label: "觉得该结束了", value: "J" }] },
+    { text: "你更愿意如何对待一段“彼此都还在意”的关系？", options: [{ label: "试着再走近", value: "F" }, { label: "先看对方态度", value: "I" }, { label: "把问题说清楚", value: "T" }, { label: "相信还有可能", value: "N" }] },
+    { text: "你更常因为什么而愿意在关系里“不再计较”？", options: [{ label: "觉得不值得", value: "P" }, { label: "对方确实有难处", value: "F" }, { label: "想通了其中的道理", value: "T" }, { label: "想让自己轻松点", value: "I" }] },
+    { text: "你更愿意如何面对一次“被辜负”的信任？", options: [{ label: "划清界限", value: "T" }, { label: "难过但会放下", value: "F" }, { label: "慢慢疏远", value: "I" }, { label: "相信对方也有苦衷", value: "N" }] },
+    { text: "你更常因为什么而愿意在关系里“重新开始”？", options: [{ label: "双方都还想试", value: "F" }, { label: "问题已经说清", value: "T" }, { label: "觉得还有可能", value: "N" }, { label: "想给彼此一个机会", value: "J" }] },
+    { text: "你更愿意如何对待一段“始终不确定”的关系？", options: [{ label: "享受当下", value: "P" }, { label: "想要一个答案", value: "J" }, { label: "先看对方态度", value: "F" }, { label: "分析有没有未来", value: "N" }] }
+  ];
+
   const TYPE_DESC = {
     INTJ: { title: "建筑师", tag: "战略性的独立思考者" },
     INTP: { title: "逻辑学家", tag: "无止境的知识探索者" },
@@ -264,11 +561,8 @@
     ESFP: { title: "表演者", tag: "热情洋溢的当下享受者" }
   };
 
-  const STORAGE_KEY = 'mbti_64_normal_history_v1';
+  const STORAGE_KEY = 'mbti_64_tri_history_v1';
 
-  // ============================================================
-  // 随机池工具
-  // ============================================================
   function pickRandom(pool, used) {
     const avail = pool.filter(p => !used.has(p));
     if (!avail.length) return null;
@@ -278,23 +572,20 @@
   }
 
   // ============================================================
-  // 随机池定义（普通版专用，每个池 ≥ 8 条）
-  // 段落：基础画像 / 能量 / 信息 / 决策 / 生活 / 亲密关系 / 职场 / 成长总结
+  // 解析随机池（普通版：只输出表人格，按版本深浅不同）
   // ============================================================
-
   const POOL_INTRO = [
-    `你属于 <strong>{type}</strong> 家族（{title}），细分变体是 <strong>{variant}</strong>。你的各个维度偏好比例已经绘制在下方，以下解析完全基于你的实际得分比例动态生成。`,
-    `你是 <strong>{variant}</strong>，{title}家族的一员。你的维度得分并不极端，也不是平均值，而是带着你自己的倾斜。下面这份解析，只对你一个人负责。`,
-    `你的类型是 <strong>{variant}</strong>（{title}）。四个维度上你的偏好程度各不相同，这决定了你不是一个“标准模板”，而是一个有自己比例的个体。`,
-    `你的细分变体是 <strong>{variant}</strong>。它意味着你在 {title} 的大框架下，有自己的具体用力点。以下解析按你的实际比例展开。`,
-    `你被判定为 <strong>{variant}</strong>。这不是一个标签，而是一组偏好比例的缩写。以下内容会依据你的实际得分来调整侧重。`,
-    `你是 <strong>{variant}</strong>，属于 {title} 一族。你的比例让这份解析不会完全套用模板，而是会围绕你的具体强弱点展开。`,
-    `你的结果是 <strong>{variant}</strong>。{title} 的底色之上，你的具体倾斜决定了哪些段落会更戳你。以下按比例逐段展开。`,
-    `你落在 <strong>{variant}</strong> 这个格子里。{title} 是底色，具体比例是你的纹路。以下解析基于你的比例生成，不是通用文案。`
+    `你的表人格类型是 <strong>{variant}</strong>，属于 {title} 一族。你的四个维度偏好比例已经绘制在下方，以下解析完全基于你的实际得分比例动态生成，只针对你呈现给世界的这一面。`,
+    `你是 <strong>{variant}</strong>，{title}家族的一员。你的维度得分并不极端，也不是平均值，而是带着你自己的倾斜。下面这份解析，只对你表人格的这一面负责。`,
+    `你的表人格是 <strong>{variant}</strong>（{title}）。四个维度上你的偏好程度各不相同，这决定了你不是一个“标准模板”，而是一个有自己比例的个体。`,
+    `你的表人格亚型是 <strong>{variant}</strong>。它意味着你在 {title} 的大框架下，有自己的具体用力点。以下解析按你的实际比例展开。`,
+    `你被判定为 <strong>{variant}</strong>。这不是一个标签，而是一组偏好比例的缩写。以下内容会依据你的表人格实际得分来调整侧重。`,
+    `你是 <strong>{variant}</strong>，属于 {title} 一族。你的比例让这份解析不会完全套用模板，而是会围绕你的表人格具体强弱点展开。`,
+    `你的结果是 <strong>{variant}</strong>。{title} 的底色之上，你的表人格具体倾斜决定了哪些段落会更戳你。以下按比例逐段展开。`,
+    `你落在 <strong>{variant}</strong> 这个格子里。{title} 是底色，具体比例是你的纹路。以下解析基于你的表人格比例生成，不是通用文案。`
   ];
 
   const POOL_EI_HIGH_E = [
-    `你是一个<strong>极度外向</strong>的人。你的能量像太阳一样向外辐射，极度渴望与人互动。在人群中，你总是那个最活跃、最能带动气氛的人。对你来说，没有社交的生活就像没有氧气的房间。不过，这种极度的外向也可能让你在需要深度思考时感到困难。`,
     `你的 E 维度非常突出。你喜欢热闹，喜欢被包围，喜欢在有人的空间里运转。独处对你来说不是享受，而是“没电了又没法充电”。你最大的优势是感染力，最大的风险是静不下来。`,
     `你几乎是从人群里吸取能量的。没人陪你说话时，你会觉得时间过得很慢。你擅长破冰、擅长热场、擅长把冷掉的局面重新点燃。但你要注意：不是所有问题都能靠“热闹”解决。`,
     `你的外向不只是喜欢社交，而是需要社交。人越多，你越有精神；越安静，你越觉得不对劲。你天生适合需要高频互动的场合，但也要学会忍受必要的孤独。`,
@@ -310,13 +601,10 @@
     `你偏向外向，但不是那种“必须一直有人陪”的外向。你喜欢互动，也珍惜独处，你的社交是选择，不是刚需。`,
     `你在 E 维度上略占优势。你喜欢表达、喜欢被听见，但你也知道什么时候该收。这种弹性让你不容易在社交里失控。`,
     `你偏向社交型，但不是极端型。你能在聚会里玩得开，也能一个人待得住。你的优势是切换自如，不容易被单一模式困住。`,
-    `你的外向是“温和型”的。你喜欢和人在一起，但不会强求热闹。你能在人群中找到自己的位置，也能在安静里安放自己。`,
-    `你更愿意主动一点，但不会主动到让人有压力。你喜欢交流，也懂得留白。这种分寸感是你社交上的优势。`,
-    `你的 E 比例占上风。你享受互动，但不依赖互动。你能在热闹中充电，也能在独处中回血，这让你适应力更强。`
+    `你的外向是“温和型”的。你喜欢和人在一起，但不会强求热闹。你能在人群中找到自己的位置，也能在安静里安放自己。`
   ];
 
   const POOL_EI_HIGH_I = [
-    `你是一个<strong>极度内向</strong>的人。你的内心世界是一座深邃的城堡，只有少数人能拿到钥匙。你极度需要独处的时间和空间来恢复精力。喧闹的社交场合会让你感到疲惫，甚至引发感官过载。你不是冷漠，只是你的能量电池容量较小，经不起无意义的消耗。`,
     `你的 I 维度非常突出。独处对你来说是刚需，不是奢侈。人多的场合会让你消耗得很快，你需要长时间安静才能恢复。你的深度思考能力很强，但表达往往慢半拍。`,
     `你几乎是从独处里回血的。社交对你来说是一种支出，不是收入。你不需要很多朋友，你需要的是少数几个真正懂你的人。你的安静不是高冷，是节能。`,
     `你是一个“向内充电”的人。人越多，你越累；越安静，你越清醒。你的优势是专注和深度，劣势是容易被误解为冷淡。`,
@@ -332,13 +620,10 @@
     `你偏向安静型，但不是完全封闭型。你喜欢独处，也愿意为值得的人打开自己。你的社交是精选，不是海选。`,
     `你在 I 维度上略占优势。你喜欢慢节奏、深交流，不太喜欢被推着走。你的优势是专注，劣势是有时太被动。`,
     `你偏向独处型，但不是社恐型。你能在人群里待，但你更愿意待在少数人中间。你需要自己的空间，也需要被理解。`,
-    `你的内向是“有分寸”的。你能社交，但社交后需要回血。你不是不喜欢人，你只是不喜欢“一直消耗”。`,
-    `你更愿意先观察，再决定要不要加入。你的安静里有判断，你的沉默里有筛选。你不是冷淡，你只是谨慎。`,
-    `你的 I 比例占上风。你喜欢安静，喜欢思考，喜欢不被打扰。你的优势是深度，你的功课是别让自己太封闭。`
+    `你的内向是“有分寸”的。你能社交，但社交后需要回血。你不是不喜欢人，你只是不喜欢“一直消耗”。`
   ];
 
   const POOL_SN_HIGH_S = [
-    `你是一个<strong>极度务实</strong>的人。你只相信眼睛看到的、手摸到的、真实发生的事物。你对细节的把控能力极强，是典型的“脚踏实地”的人。你对那些虚无缥缈的假设感到索然无味。你的执行力很强，但也容易被过往经验所困。`,
     `你的 S 维度非常突出。你关注现实、关注细节、关注“现在到底发生了什么”。你不喜欢空谈，你喜欢能验证的东西。你的优势是落地能力，风险是缺乏对未来的想象。`,
     `你是一个“看得见才相信”的人。抽象概念对你来说太远，具体的、可操作的东西才是你的语言。你做事踏实，但有时会错过更大的图景。`,
     `你的 S 比例很高。你擅长处理具体问题，擅长把事做细、做实。你不喜欢假设，你喜欢证据。你的优势是可靠，劣势是容易被经验绑住。`,
@@ -354,13 +639,10 @@
     `你偏向务实型，但不是死板型。你关注现实，但你不排斥新的可能。你的优势是稳中有变。`,
     `你在 S 维度上略占优势。你喜欢细节、喜欢事实、喜欢能落地的东西。你不太喜欢空谈，但你也知道有些事需要想象。`,
     `你偏向现实型，但不是封闭型。你能把事做细，也能看到一点更大的图景。你的优势是平衡。`,
-    `你的注意力更多在当下。你喜欢具体的、可操作的东西，但你也愿意听一听未来的可能。`,
-    `你更相信看得见的东西，但你不会完全否定直觉。你的优势是落地能力，你的功课是别把想象力关掉。`,
-    `你的 S 比例占上风。你喜欢事实，喜欢细节，喜欢确定。你的优势是可靠，你的功课是接受一点不确定。`
+    `你的注意力更多在当下。你喜欢具体的、可操作的东西，但你也愿意听一听未来的可能。`
   ];
 
   const POOL_SN_HIGH_N = [
-    `你是一个<strong>极度直觉</strong>的人。你的大脑永远在高速运转，你总是能看到事物背后的关联、隐喻和未来的无限可能。你讨厌繁琐的细节，渴望宏观的蓝图。你极具创造力，但你的想法有时过于超前，导致落地执行时困难重重。`,
     `你的 N 维度非常突出。你喜欢想、喜欢推演、喜欢在可能性里游走。你不喜欢被细节困住，你喜欢看更大的图景。你的优势是洞察力，风险是落不了地。`,
     `你是一个“活在可能性里”的人。现实对你来说只是起点，你真正感兴趣的是“还可能怎样”。你的创造力很强，但你的执行力需要别人补位。`,
     `你的 N 比例很高。你总能看到别人看不到的联系，总能想到别人想不到的方向。你不喜欢重复，你喜欢新东西。你的优势是创意，劣势是容易飘。`,
@@ -376,13 +658,10 @@
     `你偏向想象型，但不是漂浮型。你喜欢概念、喜欢趋势，但你也知道什么时候该回到现实。`,
     `你在 N 维度上略占优势。你喜欢可能性、喜欢新方向、喜欢“还有没有别的解法”。你的优势是创意，功课是落地。`,
     `你偏向未来型，但不是空想型。你能看到更大的图景，也愿意为它做具体的事。你的优势是方向感。`,
-    `你的注意力更多在未来和可能性上。你喜欢讨论意义、讨论趋势，但你也知道有些事必须现在就做。`,
-    `你更相信直觉和洞察，但你不会完全否定经验。你的优势是视野，功课是别把细节全丢了。`,
-    `你的 N 比例占上风。你喜欢想、喜欢推演、喜欢“如果”。你的优势是创造力，功课是落地。`
+    `你的注意力更多在未来和可能性上。你喜欢讨论意义、讨论趋势，但你也知道有些事必须现在就做。`
   ];
 
   const POOL_TF_HIGH_T = [
-    `你是一个<strong>极度理性</strong>的人。你用逻辑统治生活，对错分明。在遇到问题时，你第一时间想到的是如何高效地解决问题，而不是照顾谁的情绪。你可以在极度高压的环境下保持冷酷和理智。但在人际交往中，这种“冷血”往往会刺伤亲近的人。`,
     `你的 T 维度非常突出。你做决定靠逻辑、靠证据、靠利弊分析。你不喜欢情绪化的表达，你喜欢清晰的对错。你的优势是清醒，风险是显得不近人情。`,
     `你是一个“讲道理”的人。你能把复杂问题拆成因果链，也能在混乱里找到秩序。你的优势是判断力，功课是学会照顾情绪。`,
     `你的 T 比例很高。你更相信逻辑，而不是感觉。你能在压力下保持冷静，但你也要小心：不是所有问题都能靠道理解决。`,
@@ -398,13 +677,10 @@
     `你偏向思考型，但不是冷酷型。你能分析，也能共情。你的优势是平衡。`,
     `你在 T 维度上略占优势。你喜欢逻辑、喜欢证据，但你也知道有些事不能只讲道理。`,
     `你偏向理性型，但不是无情型。你能算账，也能体谅。你的优势是清醒中带温度。`,
-    `你更愿意先讲道理，再谈感受。你的优势是判断力，功课是别把情绪当成次要的。`,
-    `你更相信逻辑，但你不会否定情感。你的优势是分析能力，功课是柔软一点。`,
-    `你的 T 比例占上风。你喜欢清晰、喜欢对错、喜欢把事情说透。你的功课是别忽略感受。`
+    `你更愿意先讲道理，再谈感受。你的优势是判断力，功课是别把情绪当成次要的。`
   ];
 
   const POOL_TF_HIGH_F = [
-    `你是一个<strong>极度感性</strong>的人。你拥有一颗极其柔软和敏锐的心，你的共情能力几乎超载。你总是把别人的感受放在第一位，甚至愿意为此牺牲自己的利益。你能敏锐地察觉到空气中哪怕极其微小的情绪变化。但这也让你极易被消耗，容易为了维持表面的和谐而无限退让。`,
     `你的 F 维度非常突出。你做决定先看感受、看关系、看人的处境。你不喜欢冷冰冰的道理，你喜欢有温度的处理。你的优势是共情，风险是被消耗。`,
     `你是一个“先照顾人”的人。你能感觉到别人没说出口的情绪，也愿意为关系做让步。你的优势是温度，功课是别把自己丢进去。`,
     `你的 F 比例很高。你更容易被情绪牵动，也更容易在关系里付出过多。你的优势是温柔，功课是守住边界。`,
@@ -420,13 +696,10 @@
     `你偏向情感型，但不是失控型。你能共情，也能判断。你的优势是温度中带分寸。`,
     `你在 F 维度上略占优势。你在意关系、在意氛围，但你也知道什么时候该讲原则。`,
     `你偏向温暖型，但不是讨好型。你能照顾人，也懂得照顾自己。你的优势是平衡。`,
-    `你更愿意先照顾情绪，再谈道理。你的优势是共情，功课是别把原则丢掉。`,
-    `你更相信感受，但你不会完全否定逻辑。你的优势是温度，功课是保持清醒。`,
-    `你的 F 比例占上风。你喜欢和谐、喜欢理解、喜欢有温度的交流。你的功课是别太委屈自己。`
+    `你更愿意先照顾情绪，再谈道理。你的优势是共情，功课是别把原则丢掉。`
   ];
 
   const POOL_JP_HIGH_J = [
-    `你是一个<strong>极度喜欢掌控</strong>的人。你的日程表必须排得满满当当，你的房间必须井井有条。你极度厌恶不确定性和突发事件，你希望一切都在自己的计划和掌控之中。极高的执行力是你的王牌。然而，你的控制欲有时会让身边的人窒息。`,
     `你的 J 维度非常突出。你喜欢计划、喜欢秩序、喜欢事情按预期推进。你不喜欢被打乱，你喜欢确定性。你的优势是执行力，风险是太紧。`,
     `你是一个“先计划再行动”的人。你喜欢清单、喜欢节点、喜欢把事情安排清楚。你的优势是条理，功课是留一点弹性。`,
     `你的 J 比例很高。你喜欢有序、喜欢完成、喜欢“事情在我掌控里”。你的优势是效率，风险是容易焦虑。`,
@@ -442,13 +715,10 @@
     `你偏向计划型，但不是死板型。你能安排，也能调整。你的优势是稳中有变。`,
     `你在 J 维度上略占优势。你喜欢清单、喜欢节点，但你也知道有些事必须即兴。`,
     `你偏向秩序型，但不是强迫型。你能按计划走，也能接受一点变数。`,
-    `你更愿意先安排好再动手。你的优势是条理，功课是别太紧绷。`,
-    `你更相信计划，但你不会拒绝变化。你的优势是执行，功课是弹性。`,
-    `你的 J 比例占上风。你喜欢有序、喜欢完成、喜欢可预期。你的功课是接受一点不确定。`
+    `你更愿意先安排好再动手。你的优势是条理，功课是别太紧绷。`
   ];
 
   const POOL_JP_HIGH_P = [
-    `你是一个<strong>极度随性</strong>的人。你讨厌被规则束缚，喜欢随心所欲地生活。你适应力极强，总能在混乱中找到出路。但这也会让你在最后期限前疯狂赶工，甚至因为缺乏长远规划而陷入人生的停滞。`,
     `你的 P 维度非常突出。你喜欢自由、喜欢灵活、喜欢“走一步看一步”。你不喜欢被框住，你喜欢可能性。你的优势是适应力，风险是容易失控。`,
     `你是一个“随机应变”的人。你不喜欢计划，你喜欢现场发挥。你的优势是灵活，功课是别拖到最后。`,
     `你的 P 比例很高。你喜欢随性、喜欢空间、喜欢“不用按表格来”。你的优势是弹性，风险是容易焦虑。`,
@@ -464,9 +734,7 @@
     `你偏向灵活型，但不是失控型。你能应变，也能收尾。你的优势是弹性。`,
     `你在 P 维度上略占优势。你喜欢自由、喜欢即兴，但你也知道什么时候该收。`,
     `你偏向随性型，但不是拖延型。你能灵活应对，也能在需要时进入状态。`,
-    `你更愿意保留选择空间，而不是提前锁死。你的优势是适应，功课是别太松。`,
-    `你更相信灵活，但你不会完全拒绝计划。你的优势是弹性，功课是结构。`,
-    `你的 P 比例占上风。你喜欢自由、喜欢空间、喜欢“到时候再说”。你的功课是给自己一点节奏。`
+    `你更愿意保留选择空间，而不是提前锁死。你的优势是适应，功课是别太松。`
   ];
 
   const POOL_RELATION = [
@@ -517,7 +785,7 @@
     `你不需要一次解决所有问题。选一个最戳你的点，先动它。动起来，比想明白更重要。`
   ];
 
-  const POOL_SHORT_100 = [
+  const POOL_SHORT = [
     `以上是为你量身定制的深度解析。接受自己的长板，修补自己的短板，你会走得更远。`,
     `这份解析到这里。它不是一个结论，而是一面镜子。你能从中认出多少，就说明你对自己有多诚实。`,
     `你的类型不是终点，是起点。你能用这份解析做什么，比解析本身更重要。`,
@@ -542,16 +810,30 @@
   }
 
   function prepareQuestions(base, count) {
-    return shuffle(base).slice(0, count).map(q => ({
+    let pool = base.slice();
+    if (pool.length < count) {
+      const extra = [];
+      let i = 0;
+      while (pool.length + extra.length < count) {
+        const q = base[i % base.length];
+        extra.push({ text: "换个角度：" + q.text, options: q.options.map(o => ({ label: o.label, value: o.value })) });
+        i++;
+      }
+      pool = pool.concat(extra);
+    }
+    return shuffle(pool).slice(0, count).map(q => ({
       text: q.text,
       options: shuffle(q.options).map(o => ({ label: o.label, value: o.value }))
     }));
   }
 
-  function getQuestions() {
-    return prepareQuestions(NORMAL_BASE, 100);
+  function getVersionQuestions(version) {
+    if (version === 40) return prepareQuestions(SIMPLE_BASE, 40);
+    if (version === 100) return prepareQuestions(NORMAL_BASE, 100);
+    return prepareQuestions(DEEP_BASE, 200);
   }
 
+  let currentVersion = 40;
   let questions = [];
   let currentQuestionIndex = 0;
   let answers = [];
@@ -574,13 +856,18 @@
   const mainHistorySection = document.getElementById('mainHistorySection');
   const mainHistoryList = document.getElementById('mainHistoryList');
   const mainHistoryClear = document.getElementById('mainHistoryClear');
+  const versionTabs = document.querySelectorAll('.version-tab');
 
-  function resetState() {
-    questions = getQuestions();
+  function resetState(version) {
+    currentVersion = version;
+    questions = getVersionQuestions(version);
     currentQuestionIndex = 0;
     answers = new Array(questions.length).fill(null);
     quizArea.classList.remove('hidden');
     resultArea.classList.add('hidden');
+    versionTabs.forEach(tab => {
+      tab.classList.toggle('active', parseInt(tab.dataset.version) === version);
+    });
     renderQuestion();
   }
 
@@ -639,14 +926,13 @@
     }
   }
 
-  function calculate() {
-    const counts = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
-    answers.forEach(v => { if (v && counts.hasOwnProperty(v)) counts[v]++; });
-    const total = answers.length || 1;
+  function calculateVariant(counts) {
+    const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
     const e = counts.E >= counts.I ? 'E' : 'I';
     const s = counts.S >= counts.N ? 'S' : 'N';
     const t = counts.T >= counts.F ? 'T' : 'F';
     const j = counts.J >= counts.P ? 'J' : 'P';
+    const type = e + s + t + j;
     let suffix = '';
     if (counts[e] / total > 0.7) suffix += e;
     if (counts[s] / total > 0.7) suffix += s;
@@ -654,14 +940,21 @@
     if (counts[j] / total > 0.7) suffix += j;
     if (suffix.length === 0) suffix = 'A';
     else if (suffix.length === 4) suffix = 'T';
-    return { type: e + s + t + j, variant: e + s + t + j + '-' + suffix, counts };
+    return type + '-' + suffix;
+  }
+
+  function calculate() {
+    const counts = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+    answers.forEach(v => { if (v && counts.hasOwnProperty(v)) counts[v]++; });
+    const variant = calculateVariant(counts);
+    return { variant, type: variant.substring(0, 4), counts };
   }
 
   function renderDims(counts) {
-    const totalEI = counts.E + counts.I || 1;
-    const totalSN = counts.S + counts.N || 1;
-    const totalTF = counts.T + counts.F || 1;
-    const totalJP = counts.J + counts.P || 1;
+    const totalEI = (counts.E + counts.I) || 1;
+    const totalSN = (counts.S + counts.N) || 1;
+    const totalTF = (counts.T + counts.F) || 1;
+    const totalJP = (counts.J + counts.P) || 1;
     const dims = [
       { left: 'E', right: 'I', l: (counts.E / totalEI) * 100 },
       { left: 'S', right: 'N', l: (counts.S / totalSN) * 100 },
@@ -681,9 +974,9 @@
   }
 
   // ============================================================
-  // 解析生成（普通版随机池）
+  // 解析生成（只输出表人格，按版本深浅不同）
   // ============================================================
-  function generateDetailedText(type, variant, counts) {
+  function generateDetailedText(type, variant, counts, version) {
     const info = TYPE_DESC[type] || { title: '探索者', tag: '独特的人格组合' };
     const pE = Math.round((counts.E / (counts.E + counts.I || 1)) * 100) || 0;
     const pI = 100 - pE;
@@ -755,6 +1048,13 @@
     const work = pickRandom(POOL_WORK, used);
     if (work) html += `<p>${fill(work)}</p>`;
 
+    // 40题极简版到此收尾
+    if (version === 40) {
+      const short = pickRandom(POOL_SHORT, used);
+      if (short) html += `<p>${fill(short)}</p>`;
+      return html;
+    }
+
     // 成长总结
     html += `<h3>【终极命题】你的成长与破局之路</h3>`;
     const growth = pickRandom(POOL_GROWTH, used);
@@ -762,9 +1062,44 @@
     const advice = pickRandom(POOL_ADVICE, used);
     if (advice) html += `<p>${fill(advice)}</p>`;
 
-    // 结尾
-    const ending = pickRandom(POOL_SHORT_100, used);
-    if (ending) html += `<p>${fill(ending)}</p>`;
+    if (version === 100) {
+      const short = pickRandom(POOL_SHORT, used);
+      if (short) html += `<p>${fill(short)}</p>`;
+      return html;
+    }
+
+    // 200题深度思考版：追加压力模式与关系深化
+    html += `<h3>【压力模式】你在高压下的真实反应</h3>`;
+    html += `<p>你在压力下最容易出现的反应，是把你最擅长的那一面用到过头。你越焦虑，越会回到你最熟悉的功能里，结果反而把自己困住。你需要练习在压力下切换：不是用更多同一种方式去硬扛，而是试着调用你平时最少用的那一面。</p>`;
+    if (pE >= 60) {
+      html += `<p>你的压力出口在“向外”：你会找人说话、找人确认、找人陪。但真正让你恢复的，往往是先安静下来，把问题拆开。你需要在压力下允许自己先独处一会儿。</p>`;
+    } else {
+      html += `<p>你的压力出口在“向内”：你会关起来、自己消化、不麻烦别人。但真正让你恢复的，往往是先把话说出来。你需要在压力下允许自己求助一次。</p>`;
+    }
+    if (pN >= 60) {
+      html += `<p>你在压力下容易越想越远，把一个小问题推演成一个大灾难。你需要练习把注意力拉回当下，先处理眼前这一件事。</p>`;
+    } else {
+      html += `<p>你在压力下容易只盯着细节，反复检查、反复确认。你需要练习抬头看一眼全局，确认方向有没有偏。</p>`;
+    }
+
+    html += `<h3>【关系深化】你在关系里最容易忽略的东西</h3>`;
+    if (pF >= 60) {
+      html += `<p>你在关系里最容易忽略的是自己的需要。你太擅长照顾别人，以至于别人也忘了你也会累。你需要练习把“我想要”说出口，而不是等对方猜。</p>`;
+    } else {
+      html += `<p>你在关系里最容易忽略的是对方的情绪。你太擅长讲道理，以至于对方要的是被理解，不是被纠正。你需要练习在讲道理之前，先接住情绪。</p>`;
+    }
+    if (pJ >= 60) {
+      html += `<p>你在关系里容易把“安排好”当成“在乎”。但有时候对方要的不是计划，是陪伴。你需要允许关系里有一些没有安排的时间。</p>`;
+    } else {
+      html += `<p>你在关系里容易把“随性”当成“自由”。但有时候对方要的不是空间，是确定。你需要允许关系里有一些明确的承诺。</p>`;
+    }
+
+    html += `<h3>【长期成长】从表人格走向更完整的自己</h3>`;
+    html += `<p>你的表人格是你最熟练的那套系统。它帮你走到今天，也限制你走到更远。真正的成长，不是抛弃它，而是在需要的时候，能调用另一套系统。你不需要变成另一个人，你只需要变得更灵活。</p>`;
+    html += `<p>你可以从一个小动作开始：每周做一件“不像你”的事。如果你习惯热闹，就安静一天；如果你习惯独处，就主动约一次人；如果你习惯讲道理，就先接一次情绪；如果你习惯随性，就认真做一次计划。你会发现，那些“不像你”的部分，也是你的一部分。</p>`;
+
+    const short = pickRandom(POOL_SHORT, used);
+    if (short) html += `<p>${fill(short)}</p>`;
 
     return html;
   }
@@ -840,11 +1175,11 @@
     resultTitle.textContent = info.title;
     resultTagline.textContent = info.tag;
     renderDims(counts);
-    const descHtml = generateDetailedText(type, variant, counts);
+    const descHtml = generateDetailedText(type, variant, counts, currentVersion);
     resultDesc.innerHTML = descHtml;
     quizArea.classList.add('hidden');
     resultArea.classList.remove('hidden');
-    saveToHistory(variant, 100, counts, descHtml);
+    saveToHistory(variant, currentVersion, counts, descHtml);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -856,6 +1191,16 @@
     renderQuestion();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  // ============================================================
+  // 事件绑定
+  // ============================================================
+  versionTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const v = parseInt(tab.dataset.version);
+      if (v !== currentVersion) resetState(v);
+    });
+  });
 
   nextBtn.addEventListener('click', goToNext);
   prevBtn.addEventListener('click', goToPrev);
@@ -875,7 +1220,10 @@
     renderHistory();
   });
 
-  resetState();
+  // ============================================================
+  // 启动
+  // ============================================================
+  resetState(40);
 })();
 </script>
 </body>

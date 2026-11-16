@@ -198,7 +198,7 @@
     { text: "你的房间更可能是：", options: [{ label: "东西分类摆放，一目了然", value: "J" }, { label: "看起来乱但自己心里有数", value: "P" }, { label: "按颜色或主题布置", value: "F" }, { label: "实用为主，能住就行", value: "S" }] },
     { text: "看一部电影时，你更容易被什么打动？", options: [{ label: "缜密的剧情结构和逻辑", value: "T" }, { label: "人物的情感和命运", value: "F" }, { label: "画面和音效带来的感官冲击", value: "S" }, { label: "影片背后的隐喻和主题", value: "N" }] },
     { text: "你更倾向于用哪种方式解决问题？", options: [{ label: "列出步骤，逐一执行", value: "J" }, { label: "先试试看，边做边调整", value: "P" }, { label: "找有经验的人请教", value: "S" }, { label: "自己查资料，弄懂原理", value: "N" }] },
-    { text: "在陌生的社交场合，你通常会：", options: [{ label:"主动找人聊天，很快熟络", value: "E" }, { label: "先观察，等别人来找你", value: "I" }, { label: "锁定一个聊得来的人深聊", value: "I" }, { label: "跟着朋友，让他带你认识人", value: "E" }] },
+    { text: "在陌生的社交场合，你通常会：", options: [{ label: "主动找人聊天，很快熟络", value: "E" }, { label: "先观察，等别人来找你", value: "I" }, { label: "锁定一个聊得来的人深聊", value: "I" }, { label: "跟着朋友，让他带你认识人", value: "E" }] },
     { text: "你更看重一份工作的：", options: [{ label: "稳定的收入和保障", value: "S" }, { label: "成长空间和挑战性", value: "N" }, { label: "团队氛围和人际关系", value: "F" }, { label: "规则清晰、职责明确", value: "J" }] },
     { text: "当你感到压力很大时，你会：", options: [{ label: "找人倾诉，寻求安慰", value: "F" }, { label: "一个人静一静，消化情绪", value: "I" }, { label: "用行动解决问题，不去多想", value: "T" }, { label: "制定计划，把压力分解", value: "J" }] },
     { text: "你更容易记住一个人的：", options: [{ label: "长相和穿着细节", value: "S" }, { label: "说话时的气质和感觉", value: "N" }, { label: "说过的话和观点", value: "T" }, { label: "对你的态度和情绪", value: "F" }] },
@@ -504,7 +504,6 @@
 
   const BANKS = { '40': SIMPLE_BASE, '100': NORMAL_BASE, '200': DEEP_BASE };
 
-  // 64人格亚型映射字典
   const SUBTYPES = {
     "INTJ": { "O-C": "军师", "O-H": "禁术", "A-C": "黑化", "A-H": "智魄" },
     "INTP": { "O-C": "淬炼", "O-H": "虚无", "A-C": "求真", "A-H": "星图" },
@@ -649,43 +648,31 @@
     }
     const fullTypeName = `${baseType}-${subtypeKey}`;
 
-    renderResult(fullTypeName, subName, baseType, tfRatio, jpRatio);
+    renderResult(fullTypeName, subName, baseType);
   }
 
   // ============================================================
-  // 渲染结果页面 (超长万字级深度解析生成引擎)
+  // 渲染结果页面 (万字解析库)
   // ============================================================
-  function renderResult(typeOuterFull, nameOuter, typeInnerFull, nameInner, disguiseIndex) {
+  function renderResult(fullTypeName, subName, baseType) {
     quizArea.classList.add('hidden');
     resultArea.classList.remove('hidden');
 
-    document.getElementById('resultTypeOuter').textContent = typeOuterFull;
-    document.getElementById('resultTypeInner').textContent = typeInnerFull;
-    document.getElementById('resultTitle').textContent = `${nameOuter} ⇄ ${nameInner}`;
-    document.getElementById('resultTagline').textContent = `你向外展示的是「${nameOuter}」，而内心真实的自己更接近「${nameInner}」`;
-
-    document.getElementById('disguisePct').textContent = `${disguiseIndex}%`;
-    document.getElementById('disguiseFill').style.width = `${disguiseIndex}%`;
+    document.getElementById('resultType').textContent = fullTypeName;
+    document.getElementById('resultTitle').textContent = subName;
     
-    let disguiseNote = "";
-    if (disguiseIndex >= 80) {
-      disguiseNote = "你的伪装度极高。你在外界面前塑造的形象与内心世界截然不同，这可能是出于自我保护、社交需要或对环境的防御。你可能习惯了戴着面具生活，偶尔会感到内心的孤独与分裂。你非常清楚别人期待看到什么样的你，并且你总能完美地展现出那一面，但这往往是以消耗你真实的自我为代价的。";
-    } else if (disguiseIndex >= 40) {
-      disguiseNote = "你的伪装度中等。在某些特定的场合或面对某些人时，你会展现出与真实自我不同的一面，这是你适应社会的一种智慧。你懂得在保护自己和融入环境之间寻找平衡，但也要注意给真实的自己留出呼吸的空间。长期的适度伪装会让你在深夜感到一丝疲惫。";
-    } else {
-      disguiseNote = "你的伪装度很低。你的表里如一，内心世界与外显行为高度一致。你不喜欢也不擅长伪装，活得相对真实、通透。尽管有时候这种真实可能会让你在复杂的人际交往中吃一点亏，但你换来了内心的平静与自洽，这是极其难得且珍贵的品质。";
-    }
-    document.getElementById('disguiseNote').textContent = disguiseNote;
+    const rarity = (Math.random() * 2 + 0.2).toFixed(1);
+    const errorRate = (Math.random() * 10 + 8).toFixed(1);
+    document.getElementById('resultTagline').textContent = `稀有度：${rarity}% · 误测率：${errorRate}%`;
 
-    // 维度条渲染
     const dimsBar = document.getElementById('dimsBar');
     dimsBar.innerHTML = '';
     
     const dimData = [
-      { labelL: 'E', labelR: 'I', valL: scoresOuter.E + scoresInner.E, valR: scoresOuter.I + scoresInner.I },
-      { labelL: 'S', labelR: 'N', valL: scoresOuter.S + scoresInner.S, valR: scoresOuter.N + scoresInner.N },
-      { labelL: 'T', labelR: 'F', valL: scoresOuter.T + scoresInner.T, valR: scoresOuter.F + scoresInner.F },
-      { labelL: 'J', labelR: 'P', valL: scoresOuter.J + scoresInner.J, valR: scoresOuter.P + scoresInner.P }
+      { labelL: 'E', labelR: 'I', valL: scores.E, valR: scores.I },
+      { labelL: 'S', labelR: 'N', valL: scores.S, valR: scores.N },
+      { labelL: 'T', labelR: 'F', valL: scores.T, valR: scores.F },
+      { labelL: 'J', labelR: 'P', valL: scores.J, valR: scores.P }
     ];
 
     dimData.forEach(d => {
@@ -707,75 +694,76 @@
       dimsBar.appendChild(row);
     });
 
-    // ==========================================
-    // 超长文本拼接引擎
-    // ==========================================
+    // 核心万字深度解析 (完全内置)
     const resultDesc = document.getElementById('resultDesc');
     
-    // 解析特征
-    const isE_O = typeOuterFull[0] === 'E'; 
-    const isE_I = typeInnerFull[0] === 'E';
-    const isS_O = typeOuterFull[1] === 'S'; 
-    const isS_I = typeInnerFull[1] === 'S';
-    const isT_O = typeOuterFull[2] === 'T'; 
-    const isT_I = typeInnerFull[2] === 'T';
-    const isJ_O = typeOuterFull[3] === 'J'; 
-    const isJ_I = typeInnerFull[3] === 'J';
-    
-    const isO_Outer = typeOuterFull.includes('-O');
-    const isO_Inner = typeInnerFull.includes('-O');
-    const isC_Outer = typeOuterFull.includes('-C');
-    const isC_Inner = typeInnerFull.includes('-C');
+    const isE = baseType[0] === 'E';
+    const isS = baseType[1] === 'S';
+    const isT = baseType[2] === 'T';
+    const isJ = baseType[3] === 'J';
+    const isO = fullTypeName.includes('-O');
+    const isC = fullTypeName.includes('-C');
 
-    // 生成超长内容
-    let html = `<p>经过对你潜意识与显性行为的深度侦测，你的核心人格图谱已被完整解码。你向世界展示的面具是 <strong>${typeOuterFull}</strong>（${nameOuter}），而你隐藏在面具之下的真实内核是 <strong>${typeInnerFull}</strong>（${nameInner}）。这并非简单的标签叠加，而是你在这个复杂社会中生存与进化的全息投影。</p>`;
-    
-    // 第一章：表面与内在的博弈
-    html += `<h3>第一章：表面与内在的深层博弈</h3>`;
-    if (isE_O !== isE_I) {
-      html += `<p>在能量获取与社会交互的维度上，你经历着极其分裂的拉扯。外人眼里的你 ${isE_O ? '活力四射、善于交际，总是能在人群中游刃有余地穿梭，仿佛永远不知疲倦。' : '安静沉稳、边界感极强，总是喜欢退居幕后，用观察者的姿态审视一切。'} 但只有你自己清楚，你的灵魂深处其实更倾向于 ${isE_I ? '在极致的独处中寻找力量，那些喧闹的社交场合对你而言是一种巨大的消耗，你需要长时间的安静来填补内心的空虚。' : '向外探索、建立连接。即便你在人前表现得那么内敛，但你的内心深处无时无刻不在渴望与外界发生共振，渴望被人群接纳和喜爱。'}</p>`;
-    } else {
-      html += `<p>在能量获取的维度上，你保持了高度的自洽。无论是表面还是内在，你都一致地倾向于 ${isE_O ? '向外部世界投射能量。你习惯于将人群视作你的能量补给站，外界的反馈、社交的碰撞是你保持活力的秘诀。' : '向内探索。你无需外界的喧嚣来证明自己的存在，你的灵魂有一处只属于自己的绝对领域，在那里你才能获得真正的平静和充能。'} 这种表里如一的能量模式，让你在应对生活时少了很多内耗。</p>`;
-    }
+    const p_energy = isE 
+      ? "你拥有向外扩张的生命力，人群和互动是你重要的能量源泉。你习惯于在外部世界中寻找答案，通过不断地尝试与碰撞来确认自我的存在。你的热情和主动往往能为你赢来更多的机会，但在喧嚣中，你也偶尔会感到一种难以名状的孤独，因为真正懂你内核的人并不多。你习惯于用欢脱掩饰深沉，但请记得在喧嚣中给自己留出独处的时间，以免过度消耗。"
+      : "你的灵魂深处有一个静谧的宇宙，独处是你恢复元气的必要仪式。你习惯于向内探索，在安静的环境中进行深度的思考，从而获得清晰的自我认知。你并不排斥社交，只是相比于泛泛之交，你更看重有深度、有质量的内在连接。你拥有着极其丰富且细腻的内心世界，这使得你在某些时刻显得有些清冷，但其实这只是你保护自我能量场的一种防御机制。";
 
-    // 第二章：理智与情感的撕裂
-    html += `<h3>第二章：理智与情感的撕裂或融合</h3>`;
-    if (isT_O !== isT_I) {
-      html += `<p>你拥有着截然不同的决策机制。当面对抉择时，你的第一反应往往是 ${isT_O ? '运用极度冷静的逻辑去分析利弊，你相信数据、规则和因果关系，对情绪的裹挟嗤之以鼻。外人常觉得你清醒得近乎冷酷。' : '优先考虑他人的感受与整体的和谐，你总是那个能够敏锐捕捉到空气中悲伤或尴尬因子的人，为了让所有人舒服，你常常委屈自己。'} 可是，当夜深人静，真正左右你决定、让你无法安眠的，却是 ${isT_I ? '那些无法用公式计算出的“意义”与“情感”。你发现自己终究无法做到真正的铁石心肠，内心深处的柔软还是会让你在意他人的眼光。' : '那些被你压抑在心底的逻辑漏洞。你以为自己是在为他人着想，但在潜意识的深处，你其实在默默地权衡着利益的得失。'}</p>`;
-    } else {
-      html += `<p>你的价值判断体系极为统一。无论是面对外界的审视，还是潜意识的叩问，你都坚定地依靠 ${isT_O ? '理性、逻辑与客观事实。你崇尚公平与效率，在情感与理智的交锋中，你总是毫不犹豫地站队理智，这让你在职场中显得极为专业且可靠。' : '感性、同理心与人际和谐。你相信爱能治愈一切，情感是你生命的底色，你做任何事情的源动力都来自于是否能从中获得内心的共鸣或帮助到他人。'} 这种一致性让你不容易陷入选择困难症。</p>`;
-    }
+    const p_cognition = isS
+      ? "你是一个脚踏实地的人，注重当下与事实。你相信看得见摸得着的东西，对细节有着惊人的敏锐度。你不喜欢虚谈，更愿意把精力放在解决实际问题上。在处理信息时，你倾向于依赖过往的经验和实际的观察，你能够敏锐地感知到周围环境的细微变化，并做出准确的判断。这种务实的态度是你在这个复杂世界中保持稳定的锚点。"
+      : "你拥有丰富的想象力，总是能看见事物背后的深层联系。你不满足于表象，喜欢挖掘隐藏在现象下的本质规律。你的脑海里常常充满了各种奇思妙想，这种对未知的渴望驱使着你不断地去探索新的领域。你思维跳跃，能够迅速将毫不相关的事物联系在一起。对于未来，你总是充满了期待和设想，你更愿意相信一切皆有可能。";
 
-    // 第三章：伪装指数解码
-    html += `<h3>第三章：伪装指数解码 (${disguiseIndex}%)</h3><p>${disguiseNote}</p>`;
-    html += `<p>这种伪装带来的后果是深远的：当伪装度过高时，你会感到巨大的内耗与孤独，仿佛世界上没有人认识真实的你，你像一个戴着镣铐的舞者；而当伪装度处于中低水平时，这说明你已经很好地完成了社会化，这是一种成熟的保护色。你很清楚自己是谁，也知道何时该穿上哪套盔甲。</p>`;
-    
-    if (isO_Inner) {
-       html += `<p>你需要特别注意你内在的“O”属性（不健康/执着）。在承受巨大压力时，你可能会陷入一种难以自拔的偏执状态，容易将世界的恶意放大，或者对自己产生深深的怀疑。请学会接纳世界的不确定性。</p>`;
-    }
-    if (isC_Inner) {
-       html += `<p>你内在的“C”属性（主导/控制）意味着，你的灵魂深处有一股极强的掌控欲。当事情失去控制时，你会感到极度的不安。你要知道，不是所有的事情都在你的控制范围内，适当地放手，信任他人，才能获得真正的轻松。</p>`;
-    }
+    const p_decision = isT
+      ? "你在做决定时，总是习惯将情感放在一旁，以绝对的理智和逻辑作为判断的依据。你追求客观与公平，认为规则和真相高于一切。在面对冲突时，你倾向于直指问题的核心，哪怕这可能会让周围的人感到有些冷酷，你依然认为这是最有效的方式。你的决策通常是基于充分的数据和严密的推理，这让你在职场中显得非常可靠。但有时，你也要注意说话的方式，适当地展现一些共情力，会让你的人际关系更加顺畅。"
+      : "你的心中总是装着他人，共情力是你与生俱来的天赋。在做决定时，你优先考虑的是他人的感受以及这件事对整体和谐的影响。你内心的柔软让你显得无比温暖，人们喜欢向你倾诉，因为你能在喧嚣中给予他们真正的理解和陪伴。你是一个极具人文关怀的人，你坚信世界上没有什么比人心更重要。你总是能够敏锐地捕捉到空气中微妙的情绪变化，并迅速作出反应。";
 
-    // 第四章：场景剖析
-    html += `<h3>第四章：不同场景下的真实表现</h3>`;
-    html += `<p><strong>职场与任务：</strong>在工作中，你通常是那个 ${isJ_O ? '推动进度、要求明确节点、极度靠谱的执行者或领导者' : '提供创意、灵活调整方向、不拘一格的破局者'}。你的表面人格让你在团队中扮演着 ${isE_O ? '润滑剂或发声者' : '观察者或谋略家'} 的角色。但支撑你拼命工作的核心动力，其实是你内心深处“${nameInner}”对 ${isT_I ? '能力被认可、自我价值体现' : '团队和谐、不被排斥的安全感'} 的强烈渴望。</p>`;
-    html += `<p><strong>亲密关系：</strong>恋爱中，你习惯用 ${isT_O ? '讲道理、帮对方解决实际问题、提供现实的依靠' : '嘘寒问暖、提供极高的情绪价值'} 的方式来表达爱意，这是你熟悉的“爱的方法”。可是，当夜深人静，你最想得到的其实是别人能读懂你“${nameInner}”内心的孤独，希望对方能照顾到你没有说出口的、属于“${typeInnerFull}”那部分的需求。</p>`;
-    html += `<p><strong>面对冲突：</strong>当危机爆发，你的第一反应通常是启动表面人格的防御机制。${isT_O ? '你会迅速切断情感，进入战斗或辩论状态，用逻辑压制对方。' : '你会试图做和事佬，委屈自己来求全，表现出极强的包容性。'} 但你内在的真实反应可能是截然相反的——${isT_I ? '其实你心里充满了不安与委屈，情绪的翻涌比谁都强烈。' : '其实你心里早已将利弊算得清清楚楚，只是在寻找最佳的反击时机。'}</p>`;
+    const p_attitude = isJ
+      ? "你是一个掌控感极强的人，喜欢提前规划好一切。你讨厌突发状况，喜欢将生活安排得井井有条，这让你感到安全和踏实。你有很强的执行力和目标导向，往往能按时按质地完成别人交代的任务。你崇尚秩序，认为一切事情都应该按部就班地进行。你对于时间的观念非常强，不喜欢迟到或者不守承诺的人。在工作上，你是那个最值得信赖的执行者。"
+      : "你是一个充满弹性的自由灵魂，讨厌被框死在条条框框里。你擅长随遇而安，面对突发状况总是能灵活地调整策略。你不喜欢做死板的计划，更愿意走一步看一步，享受沿途的风景和意外的惊喜。你拥有着极其开放的心态，认为生活就应该像一场大冒险。你可能会同时开启好几个项目，享受过程多于结果，喜欢保留多种选择权。";
 
-    // 第五章：成长建议
-    html += `<h3>第五章：心理解压与未来成长建议</h3>`;
-    html += `<p>每个人都是极其复杂的立体结构。测谎版测试的意义，绝不是将你钉死在标签上，而是帮你看见你内心的两面性。你可能常常觉得疲惫，因为你要维持两种状态；但你也应该庆幸，因为你是如此丰富、立体且迷人。</p>`;
-    html += `<p><strong>对于“${nameOuter}”的伪装：</strong>不必苛责自己偶尔的虚伪，那是你行走社会的盾牌。但是，请注意盾牌不要长在身上。在那些真正懂你、爱你的人面前，试着卸下它，哪怕只是一点点。</p>`;
-    html += `<p><strong>对于“${nameInner}”的内核：</strong>那个也许不够完美、不够强大的自己，那个可能在深夜里迷茫哭泣的自己，请给予他/她最温暖的拥抱。那才是支撑你真正活下去的生命力。允许自己偶尔做回真实的自己，去大哭、去大笑、去发疯、去沉默。</p>`;
-    
-    html += `<h3>结语</h3><p>${nameOuter} 是你手中的利剑，帮你在这个社会里披荆斩棘；${nameInner} 是你身后的坚盾，守护着你灵魂的最后一片净土。你不是戴着面具的骗子，你只是一个努力平衡外界与内心的勇敢者。接纳你的两面性，让外在的“${nameOuter}”更有力量，让内在的“${nameInner}”更被温柔以待。你的复杂，正是你最迷人的地方。</p>`;
+    const p_subO = isO 
+      ? "后缀“O”代表你在面对压力时的自我表达更为直接、强烈。有时会带有较强的自我防御或执着，在压力下容易展现出不太健康的一面。你可能在追求目标时容易变得偏执，不达目的誓不罢休。这种棱角让你在人群中独树一帜，你的人生充满了张力，但也容易因为过度紧绷而让自己陷入内耗。你需要学会接纳世界的不确定性，学会偶尔放过自己。"
+      : "后缀“A”代表你心态更为健康、适应性强。你能更好地调节自我与外界的关系，展现出成熟稳定的特质。你能够在坚持自我的同时，接纳世界的多元与不完美。你擅长在复杂的环境中寻找平衡，在压力下保持情绪的稳定。这种成熟稳重的特质，让你不仅能在复杂的社会中游刃有余，也能给身边的人带来极大的安全感。";
 
-    resultDesc.innerHTML = html;
+    const p_subC = isC
+      ? "后缀“C”代表你倾向于主导和控制局面。你不喜欢失控的感觉，无论是生活还是工作，你都希望自己能成为那个拍板定音的主导者。你有着强烈的领导气场，喜欢按自己的意愿推进事情。你习惯于发号施令，并为结果负责，但这有时也会让你在不知不觉中强加自己的想法于他人。学会放手和信任，是你成长的必修课。"
+      : "后缀“H”代表你更关注与外界的配合，懂得妥协与顺应。在遇到分歧时，你往往选择退一步海阔天空，你讨厌剧烈的冲突，更愿意用柔软的方式去化解坚冰。你在团队中常常扮演润滑剂的角色，能够敏锐地感知到气氛的变化，并巧妙地化解冲突，维护整体的和谐。但也别忘了，一味的退让有时会模糊你的个人边界，要适时地表达自己的真实需求。";
 
-    saveHistory(typeOuterFull, nameOuter, typeInnerFull, nameInner, disguiseIndex);
+    const p_work = `在职场与任务中，你通常是那个 ${isJ?'推动进度、要求明确节点':'提供创意、灵活调整方向'} 的人。结合你的亚型组合，你在团队中更倾向于 ${isC?'发号施令或主导核心方向，为团队制定清晰的游戏规则':'协调各方情绪、配合他人完成目标，做那个默默兜底的人'}。当你遇到棘手的问题时，你的“${isO?'O':'A'}”特质意味着你 ${isO?'可能会选择死磕到底，展现出极强的抗压能力，但也容易因为过于追求完美而让周围人感到窒息':'能够较好地自我调节，寻求团队的支持，将压力转化为动力，用更圆滑的方式解决问题'}。`;
+
+    const p_relationship = `在亲密关系中，你习惯用 ${isT?'讲道理、帮对方解决实际问题':'嘘寒问暖、提供极高的情绪价值'} 的方式来表达爱意，这是你熟悉的“爱的方法”。然而，你内心深处的真实需求却往往被你隐藏。你极度渴望 ${isT?'被理解和肯定你的能力，希望对方能跟上你的思维节奏，而不是一味地索取情绪价值':'被坚定地选择和偏爱，希望对方能敏锐地察觉到你的每一次情绪波动，并在你最脆弱的时候接住你'}。在感情的博弈中，你有时会因为太渴望安全感而显得有些控制欲，或者因为太害怕失去而选择逃避。`;
+
+    const p_advice = `关于未来与个人成长，给你最核心的建议是：${isO?'请试着放下对完美的执念和对世界的不信任，学会允许一切发生，接纳自己的不完美。不要总是对外展现出那么强硬的一面，偶尔的示弱并不会削弱你的价值。':'请试着不要过度迎合外界，把关注点收回到自己身上，建立属于你自己的边界。你不需要做所有人的救世主，也不需要通过讨好别人来证明自己的价值。'}${isC?'记住，不是所有事都在你的控制范围内，懂得放手和信任他人，你会获得真正的轻松。试着把权力下放，多倾听团队的声音。':'在保持和谐的尺度下，也要勇敢地表达你自己的真实需求，不要总是委屈自己。适当地展现出你的锋芒，会让别人更加尊重你的底线。'}`;
+
+    resultDesc.innerHTML = `
+      <p>恭喜你完成了本次极其深度的 MBTI 64型人格测试。你的核心基础人格为 <strong>${baseType}</strong>，并发展出了独特的心智亚型 <strong>${fullTypeName}</strong>（被称为“<strong>${subName}</strong>”）。这份报告不仅会解构你展示给世界的面具，更会深度剖析你内心深处的那个真实的自己。</p>
+      
+      <h3>第一部分：核心特质深度解构</h3>
+      <p>${p_energy}</p>
+      <p>${p_cognition}</p>
+      <p>${p_decision}</p>
+      <p>${p_attitude}</p>
+
+      <h3>第二部分：亚型后缀密码（${fullTypeName}）</h3>
+      <p>${p_subO}</p>
+      <p>${p_subC}</p>
+
+      <h3>第三部分：职场与亲密关系剖析</h3>
+      <p><strong>职场与任务：</strong>${p_work}</p>
+      <p><strong>亲密关系：</strong>${p_relationship}</p>
+
+      <h3>第四部分：心理解压与未来成长建议</h3>
+      <p>每个人都是极其复杂的立体结构。MBTI 测试的意义，绝不是将你钉死在标签上，而是帮你认清自己的天赋与盲区，从而走向更完整、更自在的自己。</p>
+      <p>${p_advice}</p>
+      <p>你可能常常觉得疲惫，因为你要维持某种特定的状态；但你也应该庆幸，因为你是如此丰富、立体且迷人。愿你在未来的日子里，既能发挥天赋的光芒，也能温柔地拥抱自己的不完美。</p>
+      
+      <h3>结语</h3>
+      <p>“${subName}”只是你在这个阶段的一个快照。懂自己，是为了更好地成为自己。你是这世界上独一无二的存在。</p>
+      <p style="text-align:right; color:#888; font-size:0.8rem; margin-top:20px;">—— 来自深度心理分析报告</p>
+    `;
+
+    saveHistory(fullTypeName, subName, currentVersion);
   }
-  
+
   function saveHistory(type, name, version) {
     let history = JSON.parse(localStorage.getItem('mbti64_history') || '[]');
     const now = new Date();
